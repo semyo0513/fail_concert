@@ -10,11 +10,11 @@ export const S03_GroupBoard = () => {
   const isAllView = user.groupCode === 'admin';
   const groupCvs = isAllView 
     ? cvs 
-    : cvs.filter(c => c.groupCode === user.groupCode);
+    : cvs.filter(c => String(c.groupCode).trim() === String(user.groupCode).trim());
 
   const groupName = isAllView
     ? '전체 모둠'
-    : session?.groups?.find(g => g.groupCode === user.groupCode)?.groupName || `${user.groupCode.replace('10', '')}모둠`;
+    : session?.groups?.find(g => String(g.groupCode).trim() === String(user.groupCode).trim())?.groupName || `${user.groupCode.replace('10', '')}모둠`;
 
   // 1. 원인 카테고리 통계 분석 계산
   const categoryStats = {

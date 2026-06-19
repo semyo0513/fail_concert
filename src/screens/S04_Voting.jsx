@@ -12,7 +12,7 @@ export const S04_Voting = () => {
   const isAllView = user.groupCode === 'admin';
   const groupCvs = isAllView 
     ? cvs 
-    : cvs.filter(c => c.groupCode === user.groupCode);
+    : cvs.filter(c => String(c.groupCode).trim() === String(user.groupCode).trim());
 
   // 선택 상태 관리: { [categoryId]: cvId }
   const [selections, setSelections] = useState({});
@@ -63,7 +63,7 @@ export const S04_Voting = () => {
     if (isAllView) return true;
     // 해당 투표자의 모둠이 본인과 같은지 매핑 (이력서 매핑하여 체크)
     const voterCv = cvs.find(c => 'CV-' + v.voterId === c.cvId);
-    return voterCv?.groupCode === user.groupCode;
+    return String(voterCv?.groupCode).trim() === String(user.groupCode).trim();
   }).length;
 
   const votePercentage = totalEligibleVoters > 0 
