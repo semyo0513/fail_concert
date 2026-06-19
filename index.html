@@ -703,7 +703,9 @@ async function doEntry(){
     if(!res.success){ showEntryAlert('유효하지 않은 세션 코드입니다.','rose'); return; }
     user={authorName:name, school, groupCode:gc, voterId:'U-'+Math.random().toString(36).substr(2,9)};
     const saved=JSON.parse(localStorage.getItem(KEYS.USER)||'null');
-    if(saved&&saved.voterId) user.voterId=saved.voterId;
+    if(saved&&saved.voterId&&saved.voterId!=='undefined'&&saved.voterId!=='null'&&saved.authorName===name&&saved.school===school){
+      user.voterId=saved.voterId;
+    }
     localStorage.setItem(KEYS.USER, JSON.stringify(user));
     localStorage.setItem(KEYS.SID, sid);
     activeSessionId=sid;

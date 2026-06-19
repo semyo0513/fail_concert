@@ -196,8 +196,12 @@ export const AppProvider = ({ children }) => {
           return false;
         }
 
-        // 유저 정보 저장
-        saveUser({ authorName, school, groupCode });
+        // 유저 정보 저장 (동일 이름/학교인지 확인 후 다르면 voterId 재생성)
+        let finalVoterId = user.voterId || ('U-' + Math.random().toString(36).substr(2, 9));
+        if (user.authorName && (user.authorName !== authorName || user.school !== school)) {
+          finalVoterId = 'U-' + Math.random().toString(36).substr(2, 9);
+        }
+        saveUser({ authorName, school, groupCode, voterId: finalVoterId });
         setActiveSessionId(sessionId);
         localStorage.setItem('failure_cv_active_session_id', sessionId);
         setSession(sessionData);
