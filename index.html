@@ -1,16 +1,1132 @@
 <!doctype html>
 <html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>우당탕탕 AI 융합교육 생존기 - 실패학 콘서트</title>
-    <script type="module" crossorigin src="./assets/index-BjirnReQ.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-CEmlFC9P.css">
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>우당탕탕 AI 융합교육 생존기 — 실패학 콘서트</title>
+<meta name="description" content="AI 융합교육 교사 연수용 실패 이력서 작성 및 실시간 시상 투표 시스템"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Noto+Sans+KR:wght@300;400;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+<style>
+:root{
+  --bg:#0b061a;
+  --panel:rgba(18,9,46,.7);
+  --border:rgba(139,92,246,.2);
+  --border-h:rgba(6,182,212,.4);
+  --purple:#8b5cf6;
+  --purple-g:rgba(139,92,246,.5);
+  --cyan:#06b6d4;
+  --cyan-g:rgba(6,182,212,.5);
+  --pink:#ec4899;
+  --pink-g:rgba(236,72,153,.5);
+  --green:#10b981;
+  --t1:#f3f4f6;--t2:#9ca3af;--t3:#6b7280;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100vh;background:radial-gradient(circle at 50% 30%,#20144c 0%,#06020e 100%) fixed;background-attachment:fixed;color:var(--t1);font-family:'Noto Sans KR',sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:rgba(0,0,0,.3)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.screen{display:none;min-height:100vh;padding:0 16px 60px;max-width:900px;margin:0 auto}
+.screen.active{display:block}
+/* HEADER */
+header{display:flex;align-items:center;justify-content:space-between;padding:20px 0 16px;border-bottom:1px solid rgba(255,255,255,.05);margin-bottom:24px;flex-wrap:wrap;gap:10px}
+.brand{font-family:'Orbitron',sans-serif;font-weight:900;font-size:clamp(1rem,3vw,1.4rem);background:linear-gradient(135deg,#fff 30%,var(--purple) 70%,var(--cyan) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.demo-badge{font-size:.65rem;font-weight:700;color:var(--cyan);border:1px solid rgba(6,182,212,.3);background:rgba(6,182,212,.08);border-radius:999px;padding:2px 8px;margin-left:6px;-webkit-text-fill-color:var(--cyan)}
+.status-dot{width:7px;height:7px;border-radius:50%;display:inline-block;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+/* GLASS PANEL */
+.glass{background:var(--panel);backdrop-filter:blur(16px);border:1px solid var(--border);border-radius:20px;box-shadow:0 8px 32px rgba(0,0,0,.5);transition:border-color .3s}
+.glass:hover{border-color:var(--border-h)}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border-radius:12px;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .25s;border:2px solid;background:transparent;color:var(--t1);font-family:inherit}
+.btn:disabled{opacity:.4;cursor:not-allowed!important;transform:none!important;box-shadow:none!important}
+.btn-purple{border-color:var(--purple);box-shadow:0 0 12px rgba(139,92,246,.2)}
+.btn-purple:hover:not(:disabled){background:var(--purple);box-shadow:0 0 20px var(--purple-g);transform:translateY(-2px)}
+.btn-cyan{border-color:var(--cyan);box-shadow:0 0 12px rgba(6,182,212,.2)}
+.btn-cyan:hover:not(:disabled){background:var(--cyan);color:#0b061a;box-shadow:0 0 20px var(--cyan-g);transform:translateY(-2px)}
+.btn-pink{border-color:var(--pink);box-shadow:0 0 12px rgba(236,72,153,.2)}
+.btn-pink:hover:not(:disabled){background:var(--pink);box-shadow:0 0 20px var(--pink-g);transform:translateY(-2px)}
+.btn-ghost{border-color:rgba(255,255,255,.15)}
+.btn-ghost:hover:not(:disabled){background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.3)}
+.btn-sm{padding:7px 14px;font-size:.78rem;border-radius:9px}
+.btn-full{width:100%;justify-content:center}
+/* INPUT */
+.inp{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;color:var(--t1);padding:11px 15px;font-size:.9rem;width:100%;outline:none;font-family:inherit;transition:all .2s}
+.inp:focus{border-color:var(--cyan);box-shadow:0 0 10px var(--cyan-g);background:rgba(255,255,255,.07)}
+.inp::placeholder{color:var(--t3)}
+textarea.inp{resize:vertical}
+label{display:block;font-size:.75rem;font-weight:700;color:var(--t2);margin-bottom:5px}
+.field{display:flex;flex-direction:column;gap:2px;margin-bottom:14px}
+.char-count{font-size:.7rem;color:var(--t3);text-align:right;margin-top:2px}
+/* ALERT */
+.alert{padding:12px 14px;border-radius:12px;font-size:.8rem;display:flex;gap:10px;align-items:flex-start;margin-bottom:14px}
+.alert-cyan{background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.2);color:var(--cyan)}
+.alert-rose{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:#fca5a5}
+.alert-green{background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);color:var(--green)}
+/* STEP INDICATOR */
+.steps{display:flex;align-items:center;margin-bottom:28px;position:relative}
+.steps::before{content:'';position:absolute;top:50%;left:0;right:0;height:2px;background:rgba(255,255,255,.08);transform:translateY(-50%);z-index:0}
+.step-line{position:absolute;top:50%;left:0;height:2px;background:var(--cyan);transform:translateY(-50%);z-index:0;transition:width .4s}
+.step-item{display:flex;flex-direction:column;align-items:center;z-index:1;flex:1}
+.step-circle{width:32px;height:32px;border-radius:50%;border:2px solid rgba(255,255,255,.1);background:#12092e;font-size:.75rem;font-weight:700;display:flex;align-items:center;justify-content:center;color:var(--t3);transition:all .3s}
+.step-circle.active,.step-circle.done{border-color:var(--cyan);background:var(--cyan);color:#0b061a;box-shadow:0 0 12px var(--cyan-g)}
+.step-label{font-size:.65rem;margin-top:5px;color:var(--t3);transition:color .3s;text-align:center}
+.step-label.active{color:var(--cyan);font-weight:700}
+/* TAGS */
+.tag{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:999px;font-size:.72rem;border:1px solid;cursor:pointer;transition:all .2s;user-select:none}
+.tag-cyan{border-color:rgba(6,182,212,.3);color:#22d3ee;background:rgba(6,182,212,.06)}
+.tag-pink{border-color:rgba(236,72,153,.3);color:#f472b6;background:rgba(236,72,153,.06)}
+.tag-purple{border-color:rgba(139,92,246,.3);color:#c084fc;background:rgba(139,92,246,.06)}
+.tag.on.tag-cyan{background:var(--cyan);color:#0b061a;border-color:var(--cyan);box-shadow:0 0 8px var(--cyan-g)}
+.tag.on.tag-pink{background:var(--pink);color:#fff;border-color:var(--pink);box-shadow:0 0 8px var(--pink-g)}
+.tag.on.tag-purple{background:var(--purple);color:#fff;border-color:var(--purple);box-shadow:0 0 8px var(--purple-g)}
+/* FLIP CARD */
+.flip-wrap{perspective:1000px;height:420px;cursor:pointer}
+.flip-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .7s cubic-bezier(.175,.885,.32,1.275)}
+.flip-wrap.flipped .flip-inner{transform:rotateY(180deg)}
+.flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:20px;padding:20px}
+.flip-back{transform:rotateY(180deg)}
+.card-top-bar{height:3px;border-radius:20px 20px 0 0;background:linear-gradient(90deg,var(--purple),var(--pink),var(--cyan));position:absolute;top:0;left:0;right:0}
+/* WHY ROW */
+.why-row{display:flex;align-items:center;gap:8px;animation:slideIn .3s ease forwards}
+@keyframes slideIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+/* SPINNER */
+.spinner{width:20px;height:20px;border:3px solid rgba(255,255,255,.08);border-top-color:var(--cyan);border-radius:50%;animation:spin 1s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* PROGRESS BAR */
+.prog-bar{width:100%;height:8px;background:rgba(255,255,255,.05);border-radius:999px;overflow:hidden;border:1px solid rgba(255,255,255,.05)}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--pink));border-radius:999px;transition:width .5s}
+/* GRID */
+.grid2{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:520px){.grid3{grid-template-columns:1fr}}
+/* ADMIN STAGES */
+.stage-btn{width:100%;text-align:left;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);cursor:pointer;transition:all .2s;color:var(--t1);font-family:inherit}
+.stage-btn:hover{background:rgba(255,255,255,.06)}
+.stage-btn.active{background:var(--cyan);color:#0b061a;border-color:var(--cyan);box-shadow:0 0 14px var(--cyan-g);font-weight:700}
+.stage-btn .stage-desc{font-size:.7rem;opacity:.7;margin-top:2px;display:block}
+/* RESULTS */
+.winner-card{border:1px solid rgba(16,185,129,.3);background:rgba(16,185,129,.03);box-shadow:0 0 20px rgba(16,185,129,.06)}
+/* FADE */
+.fade-in{animation:fade .35s ease both}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+/* UTIL */
+.flex{display:flex}.gap2{gap:8px}.gap3{gap:12px}.gap4{gap:16px}.sb{justify-content:space-between}.ac{align-items:center}.col{flex-direction:column}
+.mt2{margin-top:8px}.mt3{margin-top:12px}.mt4{margin-top:16px}.mt6{margin-top:24px}
+.text-xs{font-size:.75rem}.text-xxs{font-size:.68rem}.text-sm{font-size:.85rem}
+.text-cyan{color:var(--cyan)}.text-pink{color:var(--pink)}.text-purple{color:var(--purple)}.text-green{color:var(--green)}.text-muted{color:var(--t2)}.text-dim{color:var(--t3)}
+.font-bold{font-weight:700}.font-black{font-weight:900}
+.w-full{width:100%}.text-center{text-align:center}
+.mono{font-family:'Orbitron',monospace;font-size:.8rem}
+.divider{height:1px;background:rgba(255,255,255,.06);margin:16px 0}
+.chip{display:inline-block;padding:2px 8px;border-radius:6px;font-size:.68rem;font-weight:700;border:1px solid}
+.chip-green{background:rgba(16,185,129,.15);border-color:rgba(16,185,129,.3);color:var(--green)}
+.chip-cyan{background:rgba(6,182,212,.12);border-color:rgba(6,182,212,.25);color:var(--cyan)}
+.italic{font-style:italic}
+.overflow-h{overflow:hidden}
+.relative{position:relative}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(6,182,212,.9);color:#0b061a;padding:10px 22px;border-radius:999px;font-size:.82rem;font-weight:700;z-index:9999;opacity:0;pointer-events:none;transition:opacity .3s;white-space:nowrap}
+</style>
+</head>
+<body>
+
+<div id="toast"></div>
+
+<!-- ==================== S-01: 입장 화면 ==================== -->
+<div id="s-entry" class="screen active" style="max-width:480px">
+  <header>
+    <div>
+      <span class="brand">실패학 콘서트</span>
+      <span class="demo-badge" id="demo-badge">DEMO</span>
+    </div>
+  </header>
+
+  <div class="glass fade-in" style="padding:28px 24px">
+    <div class="text-center" style="margin-bottom:22px">
+      <div class="text-xxs text-cyan font-bold" style="letter-spacing:.15em;font-family:'Orbitron',sans-serif;margin-bottom:6px">우당탕탕 AI 융합교육 생존기</div>
+      <div style="font-size:1.7rem;font-weight:900;margin-bottom:6px">🎪 실패학 콘서트</div>
+      <div class="text-xs text-muted">화려한 삽질을 동료와 공유하고 명예로운 상을 받아보세요!</div>
+    </div>
+
+    <div id="entry-alert"></div>
+
+    <div id="demo-info" class="alert alert-cyan" style="font-size:.75rem">
+      <span>💡</span>
+      <div>
+        <strong>체험 데모 모드</strong><br>
+        세션 코드 <strong>demo</strong>, 모둠 코드 <strong>101</strong>을 입력하면 바로 체험 가능합니다.
+      </div>
+    </div>
+
+    <div class="field"><label>교사명 (닉네임 가능)</label><input class="inp" id="e-name" placeholder="예: 김실패" maxlength="15"/></div>
+    <div class="field"><label>소속 학교</label><input class="inp" id="e-school" placeholder="예: 삼현여자중학교" maxlength="20"/></div>
+    <div class="flex gap3">
+      <div class="field" style="flex:1"><label>세션 코드</label><input class="inp" id="e-session" placeholder="예: demo" maxlength="20" style="text-align:center;font-weight:700"/></div>
+      <div class="field" style="flex:1"><label>모둠 코드</label><input class="inp" id="e-group" placeholder="예: 101" maxlength="10" style="text-align:center;font-weight:700"/></div>
+    </div>
+
+    <button class="btn btn-cyan btn-full mt3" onclick="doEntry()">
+      <span id="entry-spinner" style="display:none" class="spinner"></span>
+      <span>실패학 콘서트 입장하기 →</span>
+    </button>
+
+    <div class="text-center mt4">
+      <button class="btn btn-ghost btn-sm" onclick="goAdmin()">퍼실리테이터(관리자) 대시보드 →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== S-02: 이력서 작성 ==================== -->
+<div id="s-write" class="screen" style="max-width:680px">
+  <header>
+    <span class="brand">실패학 콘서트</span>
+    <div class="flex ac gap3">
+      <span id="w-user-info" class="text-xs text-muted"></span>
+      <button class="btn btn-ghost btn-sm" onclick="doExit()">나가기</button>
+    </div>
+  </header>
+
+  <div class="steps" id="step-bar">
+    <div class="step-line" id="step-line" style="width:0%"></div>
+    <div class="step-item"><div class="step-circle active" id="sc1">1</div><div class="step-label active" id="sl1">사건 재구성</div></div>
+    <div class="step-item"><div class="step-circle" id="sc2">2</div><div class="step-label" id="sl2">5 Whys 진단</div></div>
+    <div class="step-item"><div class="step-circle" id="sc3">3</div><div class="step-label" id="sl3">플랜 B 설계</div></div>
+  </div>
+
+  <!-- Part 1 -->
+  <div id="part1" class="glass fade-in" style="padding:24px">
+    <div class="text-xs text-cyan font-bold" style="margin-bottom:14px;letter-spacing:.1em">PART 01 · 수업 사건 재구성</div>
+    <div class="field">
+      <label>수업 / 프로젝트명 *</label>
+      <input class="inp" id="p1-title" placeholder="예: 마이크로비트 활용 스마트 홈 IoT 수업" maxlength="50"/>
+      <div class="char-count"><span id="p1-title-cnt">0</span>/50자</div>
+    </div>
+    <div class="field">
+      <label>사건 재구성 — 어떻게 실패했나요? * (50자 이상 권장)</label>
+      <textarea class="inp" id="p1-story" rows="7" placeholder="어떤 수업을 준비했고, 현장에서 어떤 돌발 상황이 발생했는지 솔직하게 서술해주세요."></textarea>
+      <div class="char-count" id="p1-story-warn" style="color:var(--pink)">50자 이상 작성을 권장합니다. (<span id="p1-story-cnt">0</span>자)</div>
+    </div>
+    <div class="flex sb mt4 gap2">
+      <span class="text-xxs text-dim" id="autosave-msg">📝 입력 내용은 자동 임시저장됩니다.</span>
+      <button class="btn btn-cyan" onclick="goStep(2)">다음 →</button>
+    </div>
+  </div>
+
+  <!-- Part 2 -->
+  <div id="part2" style="display:none" class="glass fade-in" style="padding:24px">
+    <div style="padding:24px">
+      <div class="text-xs text-cyan font-bold" style="margin-bottom:14px;letter-spacing:.1em">PART 02 · 사망 진단서 (5 Whys)</div>
+      <div class="field">
+        <label>표면적 원인 *</label>
+        <input class="inp" id="p2-surface" placeholder="예: 센서 납땜 접촉 불량으로 전원 공급 차단" maxlength="100"/>
+      </div>
+
+      <label>5 Whys 꼬리물기 (최대 5단계)</label>
+      <div id="why-container" style="margin-top:6px;display:flex;flex-direction:column;gap:8px"></div>
+      <button class="btn btn-ghost btn-sm mt3" onclick="addWhy()" id="add-why-btn">+ 왜?(Why) 추가</button>
+
+      <div class="divider"></div>
+      <label>원인 카테고리 (중복 선택 가능) *</label>
+      <div class="flex mt2" style="flex-wrap:wrap;gap:8px">
+        <span class="tag tag-cyan" data-cat="env" onclick="toggleTag(this)">🌐 환경 변수 (Wi-Fi/조도)</span>
+        <span class="tag tag-pink" data-cat="prep" onclick="toggleTag(this)">📋 준비 부족</span>
+        <span class="tag tag-purple" data-cat="tech" onclick="toggleTag(this)">⚙️ 기술적 오류</span>
+        <span class="tag tag-cyan" data-cat="student" onclick="toggleTag(this)">👥 학생 변수</span>
+        <span class="tag tag-pink" data-cat="other" onclick="toggleTag(this)">🎲 기타</span>
+      </div>
+
+      <div class="flex sb mt4 gap2">
+        <button class="btn btn-ghost" onclick="goStep(1)">← 이전</button>
+        <button class="btn btn-cyan" onclick="goStep(3)">다음 →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Part 3 -->
+  <div id="part3" style="display:none" class="glass fade-in">
+    <div style="padding:24px">
+      <div class="text-xs text-cyan font-bold" style="margin-bottom:14px;letter-spacing:.1em">PART 03 · 플랜 B 설계 및 회고</div>
+      <div class="field">
+        <label>이번 실패를 통해 배운 점 *</label>
+        <textarea class="inp" id="p3-lesson" rows="3" placeholder="이 실패를 통해 새롭게 깨달은 교육 노하우나 기술적 인사이트를 적어주세요."></textarea>
+      </div>
+      <div class="field">
+        <label>아날로그 대안 / 플랜 B *</label>
+        <textarea class="inp" id="p3-planb" rows="3" placeholder="같은 상황 재발 시 바로 꺼낼 수 있는 우회 경로나 대안책을 적어주세요."></textarea>
+      </div>
+
+      <button class="btn btn-ghost btn-sm" onclick="genAI()" id="ai-btn">✨ 다른 선생님들의 플랜 B 예시 보기</button>
+      <div id="ai-result" style="display:none;margin-top:12px" class="glass" style="padding:14px;background:rgba(139,92,246,.08);border-color:rgba(139,92,246,.2)">
+        <div style="padding:14px">
+          <div class="text-xs font-bold text-purple">✨ AI 집단지성 추천 플랜 B</div>
+          <ul id="ai-list" style="margin-top:8px;padding-left:16px;font-size:.78rem;color:var(--t2);display:flex;flex-direction:column;gap:6px"></ul>
+          <button class="btn btn-ghost btn-sm mt3" onclick="applyAI()">이 대안을 내 이력서에 추가하기</button>
+        </div>
+      </div>
+
+      <div class="flex sb mt4 gap2">
+        <button class="btn btn-ghost" onclick="goStep(2)">← 이전</button>
+        <button class="btn btn-pink" onclick="submitCV()" id="submit-btn">
+          <span id="submit-spinner" style="display:none" class="spinner"></span>
+          <span>이력서 최종 제출 🎉</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== S-03: 모둠 공유 보드 ==================== -->
+<div id="s-board" class="screen" style="max-width:900px">
+  <header>
+    <span class="brand">실패학 콘서트</span>
+    <div class="flex ac gap3">
+      <span class="text-xxs text-green">● 실시간 자동 새로고침 중</span>
+      <button class="btn btn-ghost btn-sm" onclick="doExit()">나가기</button>
+    </div>
+  </header>
+
+  <div class="flex sb ac" style="margin-bottom:16px;flex-wrap:wrap;gap:10px">
+    <div>
+      <div class="text-xxs text-cyan font-bold" style="letter-spacing:.1em">공유 및 토론 단계</div>
+      <h2 class="font-black" style="font-size:1.3rem">👥 <span id="board-title">모둠</span> 실패 공유 보드</h2>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="loadBoard()">🔄 새로고침</button>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 2fr;gap:20px" id="board-layout">
+    <!-- 차트 패널 -->
+    <div>
+      <div class="glass" style="padding:20px;margin-bottom:16px">
+        <div class="text-xs font-bold text-muted" style="margin-bottom:14px">📊 실패 원인 스펙트럼</div>
+        <div id="cat-chart"></div>
+      </div>
+      <div class="glass" style="padding:16px;font-size:.72rem;color:var(--t2);line-height:1.7">
+        <div class="font-bold text-cyan" style="margin-bottom:6px">💡 토론 팁</div>
+        <ul style="padding-left:14px">
+          <li>카드 클릭 시 3D 회전으로 5 Whys 내용을 확인하세요.</li>
+          <li>하트로 공감, 댓글로 격려를 남길 수 있습니다.</li>
+        </ul>
+      </div>
+    </div>
+    <!-- 카드 그리드 -->
+    <div id="board-grid" class="grid2"></div>
+  </div>
+
+  <!-- 모바일: 세로 레이아웃 대응 -->
+</div>
+
+<!-- ==================== S-04: 투표 화면 ==================== -->
+<div id="s-vote" class="screen" style="max-width:700px">
+  <header>
+    <span class="brand">실패학 콘서트</span>
+    <div class="flex ac gap3">
+      <span class="text-xxs text-pink">● 투표 진행 중</span>
+      <button class="btn btn-ghost btn-sm" onclick="doExit()">나가기</button>
+    </div>
+  </header>
+
+  <div id="vote-waiting" style="display:none">
+    <div class="glass text-center fade-in" style="padding:40px 24px">
+      <div style="font-size:2.5rem;margin-bottom:16px">🏆</div>
+      <h3 class="font-black" style="font-size:1.2rem;margin-bottom:8px">투표 완료! 결과 대기 중</h3>
+      <p class="text-sm text-muted" style="margin-bottom:20px">퍼실리테이터가 결과를 공개할 때까지 기다려 주세요.</p>
+      <div class="glass" style="padding:14px">
+        <div class="flex sb text-xs" style="margin-bottom:8px">
+          <span class="text-muted">모둠 투표 진행률</span>
+          <span class="text-cyan mono" id="vote-progress-text">0 / 0명</span>
+        </div>
+        <div class="prog-bar"><div class="prog-fill" id="vote-prog" style="width:0%"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="vote-form">
+    <div class="text-center" style="margin-bottom:24px">
+      <div class="text-xxs text-pink font-bold" style="letter-spacing:.1em">명예의 전당</div>
+      <h2 class="font-black" style="font-size:1.4rem;margin-top:4px">🏆 실패 시상식 투표</h2>
+      <p class="text-xs text-muted mt2">각 부문별 1명씩 선택하세요 (본인 제외)</p>
+    </div>
+    <div id="vote-categories"></div>
+    <div class="text-center mt4">
+      <button class="btn btn-pink" style="padding:13px 32px" onclick="submitVote()" id="vote-submit-btn">
+        <span id="vote-spinner" style="display:none" class="spinner"></span>
+        <span>투표 완료 제출</span>
+      </button>
+      <div class="text-xxs text-dim mt3">⚠️ 제출 후 수정은 불가합니다.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== S-05: 시상 결과 ==================== -->
+<div id="s-result" class="screen" style="max-width:800px">
+  <header>
+    <span class="brand">실패학 콘서트</span>
+    <div class="flex ac gap3">
+      <span class="text-xxs text-green">● 시상식 진행 중</span>
+      <button class="btn btn-ghost btn-sm" onclick="doExit()">나가기</button>
+    </div>
+  </header>
+
+  <div class="text-center" style="margin-bottom:28px">
+    <div class="text-xxs text-green font-bold" style="letter-spacing:.15em">AWARD CEREMONY</div>
+    <h2 class="font-black" style="font-size:1.5rem;margin-top:4px">🎊 최종 시상식 결과</h2>
+    <button class="btn btn-ghost btn-sm mt3" onclick="fireConfetti()">🎉 축하 폭죽</button>
+  </div>
+
+  <div id="result-list"></div>
+</div>
+
+<!-- ==================== 대기 화면 ==================== -->
+<div id="s-wait" class="screen" style="max-width:480px">
+  <header><span class="brand">실패학 콘서트</span></header>
+  <div class="glass text-center fade-in" style="padding:48px 24px">
+    <div style="font-size:2.5rem;margin-bottom:16px;animation:pulse 2s infinite">⏳</div>
+    <h3 class="font-black" style="font-size:1.2rem;margin-bottom:10px">연수 대기실 입장 완료</h3>
+    <p class="text-sm text-muted" style="line-height:1.8">
+      퍼실리테이터가 이력서 작성 단계를 열 때까지 대기해 주세요.<br>
+      <span class="text-cyan text-xs">화면이 자동으로 전환됩니다.</span>
+    </p>
+  </div>
+</div>
+
+<!-- ==================== ADMIN ==================== -->
+<div id="s-admin" class="screen" style="max-width:900px">
+  <header>
+    <div>
+      <span class="brand">실패학 콘서트</span>
+      <span style="margin-left:8px;font-size:.7rem;color:var(--cyan);border:1px solid rgba(6,182,212,.3);padding:2px 8px;border-radius:999px">ADMIN</span>
+    </div>
+    <div class="flex gap2">
+      <button class="btn btn-cyan btn-sm" onclick="adminRefresh()">🔄 동기화</button>
+      <button class="btn btn-ghost btn-sm" onclick="goScreen('s-entry')">← 입장 화면</button>
+    </div>
+  </header>
+
+  <div style="display:grid;grid-template-columns:280px 1fr;gap:20px" id="admin-layout">
+    <!-- 좌측: 단계 제어 -->
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="glass" style="padding:18px">
+        <div class="text-xs font-bold text-cyan" style="margin-bottom:12px;letter-spacing:.1em">🎛️ 단계 진행 제어판</div>
+        <div style="display:flex;flex-direction:column;gap:6px" id="stage-buttons">
+          <button class="stage-btn" data-status="waiting" onclick="changeStatus('waiting')">
+            <div class="text-sm font-bold">1. 입장 대기</div>
+            <span class="stage-desc">참가자 입장 화면 노출</span>
+          </button>
+          <button class="stage-btn" data-status="writing" onclick="changeStatus('writing')">
+            <div class="text-sm font-bold">2. 이력서 작성 오픈</div>
+            <span class="stage-desc">작성 폼 활성화</span>
+          </button>
+          <button class="stage-btn" data-status="sharing" onclick="changeStatus('sharing')">
+            <div class="text-sm font-bold">3. 모둠 공유 보드</div>
+            <span class="stage-desc">공유 보드 오픈</span>
+          </button>
+          <button class="stage-btn" data-status="voting" onclick="changeStatus('voting')">
+            <div class="text-sm font-bold">4. 시상 투표 오픈</div>
+            <span class="stage-desc">투표 용지 활성화</span>
+          </button>
+          <button class="stage-btn" data-status="closed_0" onclick="changeStatus('closed_0')">
+            <div class="text-sm font-bold">5-1. 폭망상 공개</div>
+            <span class="stage-desc">아름다운 폭망상 발표</span>
+          </button>
+          <button class="stage-btn" data-status="closed_1" onclick="changeStatus('closed_1')">
+            <div class="text-sm font-bold">5-2. 불사조상 공개</div>
+            <span class="stage-desc">불사조상 발표</span>
+          </button>
+          <button class="stage-btn" data-status="closed_2" onclick="changeStatus('closed_2')">
+            <div class="text-sm font-bold">5-3. 디버거상 공개</div>
+            <span class="stage-desc">인간 디버거상 발표</span>
+          </button>
+          <button class="stage-btn" data-status="closed_all" onclick="changeStatus('closed_all')">
+            <div class="text-sm font-bold">🏆 전체 공개</div>
+            <span class="stage-desc">모든 시상 결과 공개</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="glass" style="padding:18px">
+        <div class="text-xs font-bold text-purple" style="margin-bottom:12px;letter-spacing:.1em">⚙️ GAS 백엔드 URL</div>
+        <textarea class="inp" id="admin-gas-url" rows="3" style="font-size:.7rem;font-family:monospace" placeholder="https://script.google.com/macros/s/..."></textarea>
+        <div class="text-xxs text-dim" style="margin-top:5px">빈칸으로 저장 시 데모 모드로 작동합니다.</div>
+        <button class="btn btn-purple btn-sm btn-full mt3" onclick="saveGasUrl()">URL 저장하기</button>
+      </div>
+    </div>
+
+    <!-- 우측: 현황판 + 세션 생성 -->
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="glass" style="padding:18px">
+        <div class="text-xs font-bold text-muted" style="margin-bottom:14px;letter-spacing:.1em">📊 실시간 연수 집계</div>
+        <div class="grid3" style="margin-bottom:14px">
+          <div class="glass text-center" style="padding:14px;background:rgba(0,0,0,.2)">
+            <div class="text-xxs text-muted">제출 이력서</div>
+            <div class="font-black" style="font-size:1.8rem;color:var(--cyan)" id="stat-cvs">0</div>
+          </div>
+          <div class="glass text-center" style="padding:14px;background:rgba(0,0,0,.2)">
+            <div class="text-xxs text-muted">투표 완료</div>
+            <div class="font-black" style="font-size:1.8rem;color:var(--pink)" id="stat-votes">0</div>
+          </div>
+          <div class="glass text-center" style="padding:14px;background:rgba(0,0,0,.2)">
+            <div class="text-xxs text-muted">현재 단계</div>
+            <div class="font-black text-sm" style="color:var(--green);padding-top:6px" id="stat-status">-</div>
+          </div>
+        </div>
+
+        <div id="admin-vote-preview">
+          <div class="divider"></div>
+          <div class="text-xs font-bold text-muted" style="margin-bottom:8px">관리자 득표 현황 미리보기</div>
+          <div id="admin-results-preview" class="text-xs text-dim">투표가 진행되면 현황이 표시됩니다.</div>
+        </div>
+      </div>
+
+      <div class="glass" style="padding:18px">
+        <div class="text-xs font-bold text-muted" style="margin-bottom:14px;letter-spacing:.1em">🚀 신규 세션 생성</div>
+        <div class="field"><label>세션 ID</label><input class="inp" id="admin-sid" value="demo" placeholder="예: 2026-camp"/></div>
+        <div class="field"><label>연수명</label><input class="inp" id="admin-stitle" value="삼현 AI 융합교육 실패학 콘서트" placeholder="예: 2026 AI 교원 연수"/></div>
+        <div class="field"><label>모둠 목록 (쉼표 구분)</label><input class="inp" id="admin-groups" value="1모둠,2모둠,3모둠"/></div>
+        <button class="btn btn-cyan btn-sm btn-full mt2" onclick="createSession()">세션 구글 시트 등록</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// 상수 및 설정
+// ============================================================
+const GAS_DEFAULT = 'https://script.google.com/macros/s/AKfycbwMTegdCcobI65s85sNQrgWFZfIc-M6lpETNh4uIdU_JF9B1TzPt1bsBIDtGp27Vpyp/exec';
+const KEYS = { GAS:'failure_cv_gas_url2', DB:'failure_cv_demo_db2', USER:'failure_cv_user2', SID:'failure_cv_sid2' };
+
+const AWARD_CATS = [
+  { id:'award-1', name:'올해의 아름다운 폭망상', desc:'가장 용감하게 도전했고, 가장 화려하게 실패했으나, 그 용기 자체를 기립니다.' },
+  { id:'award-2', name:'불사조상', desc:'멘붕의 순간, 아무도 예상 못한 방법으로 수업을 수습해낸 순발력을 기립니다.' },
+  { id:'award-3', name:'인간 디버거상', desc:'오류와의 처절한 사투 속에서도 끝까지 분석하고 배움을 남긴 끈기를 기립니다.' }
+];
+
+const PLAN_B_TIPS = {
+  env:['학생 기기 핫스팟 & 오프라인 모드: 네트워크 차단 시 인터넷이 필요 없는 로컬 에디터나 USB 저장 교재를 사전에 준비하세요.','교사 전용 무선 에그 이중화: 학교망 장애 시 사용할 교사 무선 에그/핫스팟 환경을 항상 지참합니다.','유튜브·클라우드 리소스를 수업 전날 USB에 미리 다운로드해 두세요.'],
+  prep:['수업 15분 전 학생과 동일한 권한의 계정으로 마지막 시연을 거칩니다.','모둠별 IT 도우미 학생(AI 조교)을 1명씩 사전 트레이닝하여 즉각 지원 체계를 만드세요.','사전 배포용 "10분 체크리스트"를 항상 출력해 두세요.'],
+  tech:['Tinkercad 등 브라우저 기반 에뮬레이터를 하드웨어 고장 대비 플랜 B로 미리 열어두세요.','에러 자가진단 카드(흔한 에러 TOP5 & 해결법)를 인쇄해 모둠별 배포합니다.','소모품(케이블, 센서, 배터리)을 항상 15% 여분으로 준비하세요.'],
+  student:['기기 덮개를 덮는 "Screen Down" 신호 체계와 보상 제도를 수업 초반에 명문화하세요.','코딩 속도별 "도전 과제 카드"와 "스켈레톤 코드"를 동시에 준비해 개인차에 대응하세요.','역할 카드(개발자, 기록자, 발표자)를 배포해 역할 독점을 방지하세요.'],
+  other:['기기 전면 마비 시: 화이트보드 & 스티커를 활용한 언플러그드 알고리즘 수업으로 즉시 전환합니다.','칠판 포스트잇 디버깅 월: 에러와 해결법을 붙여 모둠 간 집단 지성을 활용하세요.','학생들의 "삽질 기록"을 칠판에 붙여 "가장 특이한 에러"를 찾는 모둠에게 스티커 보상을 주세요.']
+};
+
+const MOCK_CVS = [
+  { cvId:'mock-1', sessionId:'demo', groupCode:'101', authorName:'박실패', school:'창조중학교',
+    part1:{ projectName:'엔트리 AI 자율주행 수업', story:'카메라로 신호등을 인식하는 자율주행 수업을 준비했습니다. 전날 교무실에서는 완벽히 작동하던 AI가 교실의 직사광선 앞에서 적색·청색등을 전혀 구분하지 못해 차들이 모두 충돌하며 아수라장이 되었습니다.' },
+    part2:{ surfaceCause:'교실 조도(직사광선)에 의한 이미지 인식 모델 오작동', fiveWhys:['창가 직사광선이 카메라에 반사되었다.','형광등 아래에서만 학습 데이터를 촬영했다.','조도 변화에 대한 사전 테스트를 생략했다.'], categories:['env','tech','prep'] },
+    part3:{ lesson:'AI 이미지 분류는 조도 변화에 매우 취약합니다. 다양한 광원 조건에서 학습 데이터를 수집해야 합니다.', planB:'암막 커튼 활용 또는 초음파 센서 기반 아날로그 라인트레이서 수업안으로 대체합니다.' },
+    empathyCount:5, comments:[{ text:'빛 반사는 정말 예측 불가 복병이죠!', createdAt:new Date(Date.now()-3600000).toISOString() }], createdAt:new Date(Date.now()-7200000).toISOString() },
+  { cvId:'mock-2', sessionId:'demo', groupCode:'101', authorName:'이오류', school:'미래고등학교',
+    part1:{ projectName:'Teachable Machine 스마트 쓰레기통', story:'티쳐블 머신으로 페트병·캔을 분류하는 서보 모터 쓰레기통을 제작했습니다. 교장선생님 시연 중 모터가 오작동하여 페트병을 넣자마자 캔 보관함 문이 열리며 쓰레기가 밖으로 튀었습니다.' },
+    part2:{ surfaceCause:'아두이노 전원 부족으로 서보 모터 지터링 현상', fiveWhys:['모터 구동 시 전압이 급강하해 보드가 리셋되었다.','5V 핀에 직접 연결해 전류 공급이 부족했다.'], categories:['tech','prep'] },
+    part3:{ lesson:'서보 모터는 반드시 독립 외장 전원(배터리팩)을 사용해야 합니다.', planB:'여분의 4AA 배터리 홀더를 미리 준비하거나, 수동 경첩 방식을 플랜 B로 둡니다.' },
+    empathyCount:3, comments:[], createdAt:new Date(Date.now()-5400000).toISOString() }
+];
+
+const DEFAULT_DB = {
+  session:{ sessionId:'demo', title:'[데모] 제1회 실패학 콘서트', status:'writing',
+    groups:[{ groupCode:'101', groupName:'1모둠' },{ groupCode:'102', groupName:'2모둠' }],
+    awardCategories:AWARD_CATS },
+  cvs:[...MOCK_CVS], votes:[]
+};
+
+// ============================================================
+// 상태
+// ============================================================
+let user = JSON.parse(localStorage.getItem(KEYS.USER)||'{}');
+let activeSessionId = localStorage.getItem(KEYS.SID)||'';
+let session = null;
+let cvs = [];
+let votes = [];
+let results = [];
+let currentStep = 1;
+let whyCount = 1;
+let selectedCats = [];
+let aiSolutions = [];
+let voteSelections = {};
+let pollTimer = null;
+
+// ============================================================
+// 유틸
+// ============================================================
+const $ = id => document.getElementById(id);
+function toast(msg, dur=2500){
+  const t=$('toast'); t.textContent=msg; t.style.opacity='1';
+  setTimeout(()=>t.style.opacity='0', dur);
+}
+function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); $(id).classList.add('active'); }
+function gasUrl(){ const s=localStorage.getItem(KEYS.GAS); if(s===''||s==='null') return ''; return s||GAS_DEFAULT; }
+function isDemo(){ return !gasUrl(); }
+function getDb(){ return JSON.parse(localStorage.getItem(KEYS.DB)||'null')||JSON.parse(JSON.stringify(DEFAULT_DB)); }
+function saveDb(db){ localStorage.setItem(KEYS.DB, JSON.stringify(db)); }
+
+// ============================================================
+// GAS API
+// ============================================================
+async function gasGet(action, sid){
+  if(isDemo()){
+    await new Promise(r=>setTimeout(r,120));
+    return demoGet(action, sid);
+  }
+  const url=`${gasUrl()}?action=${action}&sessionId=${encodeURIComponent(sid)}&_t=${Date.now()}`;
+  const r=await fetch(url,{method:'GET',mode:'cors',headers:{Accept:'application/json'}});
+  return r.json();
+}
+async function gasPost(action, sid, data={}){
+  if(isDemo()){
+    await new Promise(r=>setTimeout(r,150));
+    return demoPost(action, sid, data);
+  }
+  const body=JSON.stringify({action, sessionId:sid, ...data});
+  const r=await fetch(gasUrl(),{method:'POST',mode:'cors',headers:{'Content-Type':'text/plain'},body});
+  return r.json();
+}
+
+// ============================================================
+// 데모 모드 로컬 DB 연산
+// ============================================================
+function demoGet(action, sid){
+  const db=getDb();
+  if(action==='getSession'){
+    if(db.session.sessionId===sid) return {success:true,data:db.session};
+    return {success:false,error:'세션 없음'};
+  }
+  if(action==='getCVs') return {success:true,data:db.cvs};
+  if(action==='getVotes') return {success:true,data:db.votes};
+  if(action==='getResults') return computeResults(db);
+  return {success:false,error:'unknown'};
+}
+function demoPost(action, sid, data){
+  const db=getDb();
+  if(action==='createSession'){
+    db.session={...db.session,sessionId:sid,title:data.title,status:'waiting',groups:data.groups||[],awardCategories:data.awardCategories||AWARD_CATS};
+    db.cvs=[...MOCK_CVS]; db.votes=[]; saveDb(db);
+    return {success:true,sessionId:sid};
+  }
+  if(action==='updateSessionStatus'){
+    db.session.status=data.status; saveDb(db);
+    if(data.status==='voting'&&db.votes.length===0) autoSimVotes(db,sid);
+    return {success:true};
+  }
+  if(action==='submitCV'){
+    const idx=db.cvs.findIndex(c=>c.cvId===data.cvId);
+    const cv={...data,sessionId:sid,empathyCount:idx>=0?db.cvs[idx].empathyCount:0,comments:idx>=0?db.cvs[idx].comments:[],createdAt:idx>=0?db.cvs[idx].createdAt:new Date().toISOString()};
+    if(idx>=0) db.cvs[idx]=cv; else db.cvs.push(cv);
+    saveDb(db); return {success:true};
+  }
+  if(action==='empathy'){
+    const cv=db.cvs.find(c=>c.cvId===data.cvId);
+    if(cv){ cv.empathyCount=(cv.empathyCount||0)+1; saveDb(db); return {success:true,empathyCount:cv.empathyCount}; }
+  }
+  if(action==='comment'){
+    const cv=db.cvs.find(c=>c.cvId===data.cvId);
+    if(cv){ if(!cv.comments) cv.comments=[]; cv.comments.push({text:data.commentText,createdAt:new Date().toISOString()}); saveDb(db); return {success:true}; }
+  }
+  if(action==='submitVote'){
+    const idx=db.votes.findIndex(v=>v.voterId===data.voterId&&v.sessionId===sid);
+    const vo={voteId:'V-'+Math.random().toString(36).substr(2,8),sessionId:sid,voterId:data.voterId,selections:data.selections,submittedAt:new Date().toISOString()};
+    if(idx>=0) db.votes[idx]=vo; else db.votes.push(vo);
+    saveDb(db); return {success:true};
+  }
+  if(action==='createSession') return {success:true};
+  return {success:false};
+}
+
+function computeResults(db){
+  const catVotes={};
+  (db.session.awardCategories||AWARD_CATS).forEach(c=>catVotes[c.id]={});
+  db.votes.forEach(v=>v.selections.forEach(s=>{
+    if(catVotes[s.categoryId]) catVotes[s.categoryId][s.cvId]=(catVotes[s.categoryId][s.cvId]||0)+1;
+  }));
+  const cvMap={};
+  db.cvs.forEach(c=>cvMap[c.cvId]={cvId:c.cvId,authorName:c.authorName,school:c.school,projectName:c.part1.projectName,part1:c.part1,part3:c.part3});
+  const results=(db.session.awardCategories||AWARD_CATS).map(cat=>{
+    const vc=catVotes[cat.id]||{};
+    let max=0; for(const id in vc) if(vc[id]>max) max=vc[id];
+    const winners=max>0?Object.keys(vc).filter(id=>vc[id]===max&&cvMap[id]).map(id=>({...cvMap[id],votes:max})):[];
+    return {categoryId:cat.id,categoryName:cat.name,winners,voteCount:Object.values(vc).reduce((a,b)=>a+b,0)};
+  });
+  return {success:true,results};
+}
+
+function autoSimVotes(db, sid){
+  if(!db.session.awardCategories) return;
+  const aids=db.session.awardCategories.map(c=>c.id);
+  if(db.cvs.length<2) return;
+  db.votes.push({voteId:'V-sim1',sessionId:sid,voterId:'sim-voter-1',selections:[{categoryId:aids[0],cvId:'mock-2'},{categoryId:aids[1],cvId:'mock-2'},{categoryId:aids[2],cvId:'mock-2'}],submittedAt:new Date().toISOString()});
+  db.votes.push({voteId:'V-sim2',sessionId:sid,voterId:'sim-voter-2',selections:[{categoryId:aids[0],cvId:'mock-1'},{categoryId:aids[1],cvId:'mock-1'},{categoryId:aids[2],cvId:'mock-1'}],submittedAt:new Date().toISOString()});
+  saveDb(db);
+}
+
+// ============================================================
+// 입장
+// ============================================================
+async function doEntry(){
+  const name=$('e-name').value.trim(), school=$('e-school').value.trim();
+  const sid=$('e-session').value.trim(), gc=$('e-group').value.trim();
+  if(!name||!school||!sid||!gc){ showEntryAlert('모든 항목을 입력해 주세요.','rose'); return; }
+  $('entry-spinner').style.display='inline-block';
+  document.querySelector('#s-entry .btn').disabled=true;
+  try{
+    const res=await gasGet('getSession', sid);
+    if(!res.success){ showEntryAlert('유효하지 않은 세션 코드입니다.','rose'); return; }
+    user={authorName:name, school, groupCode:gc, voterId:'U-'+Math.random().toString(36).substr(2,9)};
+    const saved=JSON.parse(localStorage.getItem(KEYS.USER)||'null');
+    if(saved&&saved.voterId) user.voterId=saved.voterId;
+    localStorage.setItem(KEYS.USER, JSON.stringify(user));
+    localStorage.setItem(KEYS.SID, sid);
+    activeSessionId=sid;
+    session=res.data;
+    startPolling();
+    routeByStatus(session.status);
+  } catch(e){ showEntryAlert('서버 연결 오류: '+e.message,'rose'); }
+  finally{ $('entry-spinner').style.display='none'; document.querySelector('#s-entry .btn').disabled=false; }
+}
+
+function showEntryAlert(msg, type){
+  $('entry-alert').innerHTML=`<div class="alert alert-${type}" style="margin-bottom:12px">⚠️ ${msg}</div>`;
+}
+
+// ============================================================
+// 화면 라우팅
+// ============================================================
+function routeByStatus(status){
+  stopPolling();
+  if(status==='waiting'){ show('s-wait'); startPolling(); }
+  else if(status==='writing'){ $('w-user-info').textContent=`${user.school} ${user.authorName} (${user.groupCode})`; loadSavedCV(); show('s-write'); goStep(1); }
+  else if(status==='sharing'){ loadBoard(); show('s-board'); startPolling(); }
+  else if(status==='voting'){ loadVote(); show('s-vote'); startPolling(); }
+  else if(status&&status.startsWith('closed')){ loadResults(); show('s-result'); startPolling(); }
+}
+
+// ============================================================
+// 폴링
+// ============================================================
+function startPolling(){
+  stopPolling();
+  pollTimer=setInterval(async()=>{
+    if(!activeSessionId) return;
+    try{
+      const res=await gasGet('getSession',activeSessionId);
+      if(res.success&&res.data.status!==session?.status){
+        session=res.data;
+        routeByStatus(session.status);
+      } else if(res.success) session=res.data;
+      // 모둠 보드 & 투표 화면 데이터 갱신
+      if(session?.status==='sharing') await loadBoard();
+      if(session?.status==='voting') await refreshVoteProgress();
+      if(session?.status&&session.status.startsWith('closed')) await loadResults();
+    } catch(_){}
+  }, 5000);
+}
+function stopPolling(){ if(pollTimer){ clearInterval(pollTimer); pollTimer=null; } }
+
+// ============================================================
+// 이력서 작성
+// ============================================================
+const STEP_LABELS=['사건 재구성','5 Whys 진단','플랜 B 설계'];
+function goStep(n){
+  currentStep=n;
+  ['part1','part2','part3'].forEach((id,i)=>{
+    $(id).style.display=i+1===n?'block':'none';
+    $(id).classList.toggle('fade-in',i+1===n);
+  });
+  ['sc1','sc2','sc3'].forEach((id,i)=>{
+    const el=$(id); const done=i+1<n, active=i+1===n;
+    el.classList.toggle('active',done||active); el.classList.toggle('done',done);
+  });
+  ['sl1','sl2','sl3'].forEach((id,i)=>{ $(id).classList.toggle('active',i+1===n); });
+  $('step-line').style.width=n===1?'0%':n===2?'50%':'100%';
+  if(n===2&&!$('why-container').children.length) addWhy();
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  $('p1-title').addEventListener('input',function(){ $('p1-title-cnt').textContent=this.value.length; autoSave(); });
+  $('p1-story').addEventListener('input',function(){
+    const l=this.value.length; $('p1-story-cnt').textContent=l;
+    $('p1-story-warn').style.color=l>=50?'var(--green)':'var(--pink)';
+    $('p1-story-warn').textContent=(l>=50?'✅ 충분합니다!':'50자 이상 작성을 권장합니다.')+' ('+l+'자)';
+    autoSave();
+  });
+  $('p3-lesson').addEventListener('input', autoSave);
+  $('p3-planb').addEventListener('input', autoSave);
+  // 관리자 GAS URL 초기값
+  $('admin-gas-url').value=gasUrl();
+  // 데모 뱃지
+  updateDemoBadge();
+  // 입장 시 이전 세션 자동 로드 시도
+  const savedUser=JSON.parse(localStorage.getItem(KEYS.USER)||'null');
+  const savedSid=localStorage.getItem(KEYS.SID);
+  if(savedUser?.authorName) { $('e-name').value=savedUser.authorName; $('e-school').value=savedUser.school; $('e-group').value=savedUser.groupCode; }
+  if(savedSid) $('e-session').value=savedSid;
+});
+
+function updateDemoBadge(){
+  $('demo-badge').style.display=isDemo()?'inline-block':'none';
+  $('demo-info').style.display=isDemo()?'flex':'none';
+}
+
+let saveTimer=null;
+function autoSave(){
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>{ saveLocalCV(); $('autosave-msg').textContent='💾 임시저장 완료 ('+new Date().toLocaleTimeString('ko-KR')+')'; }, 4000);
+}
+const CV_KEY=()=>'cv_draft_'+(user.voterId||'anon');
+function saveLocalCV(){
+  const d={ p1Title:$('p1-title').value, p1Story:$('p1-story').value, p2Surface:$('p2-surface')?.value,
+    whys:getWhys(), cats:selectedCats, lesson:$('p3-lesson')?.value, planb:$('p3-planb')?.value };
+  localStorage.setItem(CV_KEY(), JSON.stringify(d));
+}
+function loadSavedCV(){
+  const d=JSON.parse(localStorage.getItem(CV_KEY())||'null');
+  if(!d) return;
+  if(d.p1Title) $('p1-title').value=d.p1Title;
+  if(d.p1Story) $('p1-story').value=d.p1Story;
+  setTimeout(()=>{
+    if(d.p2Surface&&$('p2-surface')) $('p2-surface').value=d.p2Surface;
+    if(d.whys) d.whys.forEach((w,i)=>{ if(i>0) addWhy(); const el=document.querySelector(`#why-container input:nth-child(${i+1})`)||document.querySelectorAll('#why-container input')[i]; if(el) el.value=w; });
+    if(d.cats) d.cats.forEach(c=>{ const el=document.querySelector(`[data-cat="${c}"]`); if(el) toggleTag(el,true); });
+    if(d.lesson&&$('p3-lesson')) $('p3-lesson').value=d.lesson;
+    if(d.planb&&$('p3-planb')) $('p3-planb').value=d.planb;
+  }, 100);
+}
+
+function addWhy(){
+  if(whyCount>=5) return;
+  const container=$('why-container');
+  const row=document.createElement('div');
+  row.className='why-row'; row.style.cssText='display:flex;align-items:center;gap:8px;animation:slideIn .3s ease forwards';
+  row.innerHTML=`<span style="font-size:.72rem;font-weight:700;color:var(--cyan);min-width:50px;text-align:right">Why ${whyCount} →</span>
+    <input class="inp" style="flex:1;padding:9px 12px;font-size:.82rem" placeholder="${whyCount===1?'왜 그 일이 발생했나요?':'왜?'}"/>
+    ${whyCount>1?`<button onclick="removeWhy(this)" style="background:none;border:none;color:var(--t3);cursor:pointer;font-size:1rem;padding:4px">✕</button>`:''}`;
+  container.appendChild(row);
+  whyCount++;
+  if(whyCount>=5) $('add-why-btn').disabled=true;
+}
+function removeWhy(btn){ btn.closest('.why-row').remove(); whyCount--; $('add-why-btn').disabled=false; renumberWhys(); }
+function renumberWhys(){ document.querySelectorAll('#why-container .why-row').forEach((r,i)=>{ r.querySelector('span').textContent=`Why ${i+1} →`; }); }
+function getWhys(){ return Array.from(document.querySelectorAll('#why-container input')).map(i=>i.value.trim()).filter(Boolean); }
+
+function toggleTag(el, force){
+  if(force===undefined) el.classList.toggle('on');
+  else if(force) el.classList.add('on');
+  else el.classList.remove('on');
+  selectedCats=Array.from(document.querySelectorAll('[data-cat].on')).map(e=>e.dataset.cat);
+}
+
+function genAI(){
+  if(!selectedCats.length){ toast('원인 카테고리를 먼저 선택해 주세요.'); return; }
+  const btn=$('ai-btn'); btn.disabled=true; btn.textContent='✨ 불러오는 중...';
+  setTimeout(()=>{
+    const pool=[]; selectedCats.forEach(c=>{ if(PLAN_B_TIPS[c]) pool.push(...PLAN_B_TIPS[c]); });
+    aiSolutions=pool.sort(()=>Math.random()-.5).slice(0,3);
+    const list=$('ai-list'); list.innerHTML='';
+    aiSolutions.forEach(s=>{ const li=document.createElement('li'); li.textContent=s; list.appendChild(li); });
+    $('ai-result').style.display='block';
+    btn.disabled=false; btn.textContent='✨ 다른 예시 보기';
+  }, 1000);
+}
+function applyAI(){
+  const cur=$('p3-planb').value;
+  $('p3-planb').value=cur+(cur?'\n\n':'')+'[추천 플랜 B]\n'+aiSolutions.map((s,i)=>`${i+1}. ${s.includes(': ')?s.split(': ').slice(1).join(': '):s}`).join('\n');
+  $('ai-result').style.display='none';
+  toast('플랜 B에 추가되었습니다!');
+}
+
+async function submitCV(){
+  const title=$('p1-title').value.trim(), story=$('p1-story').value.trim();
+  const surface=$('p2-surface').value.trim(), lesson=$('p3-lesson').value.trim(), planb=$('p3-planb').value.trim();
+  if(!title||!story||!surface||!lesson||!planb){ toast('모든 필수 항목을 입력해 주세요.'); return; }
+  if(!selectedCats.length){ toast('원인 카테고리를 최소 1개 선택해 주세요.'); return; }
+  $('submit-spinner').style.display='inline-block'; $('submit-btn').disabled=true;
+  try{
+    const cvData={ cvId:'CV-'+user.voterId, groupCode:user.groupCode, authorName:user.authorName, school:user.school,
+      part1:{projectName:title,story}, part2:{surfaceCause:surface,fiveWhys:getWhys(),categories:selectedCats},
+      part3:{lesson,planB:planb} };
+    const res=await gasPost('submitCV', activeSessionId, cvData);
+    if(res.success){ localStorage.removeItem(CV_KEY()); toast('✅ 이력서가 등록되었습니다!'); }
+    else toast('제출 실패: '+res.error);
+  } catch(e){ toast('오류: '+e.message); }
+  finally{ $('submit-spinner').style.display='none'; $('submit-btn').disabled=false; }
+}
+
+// ============================================================
+// 모둠 공유 보드
+// ============================================================
+async function loadBoard(){
+  const res=await gasGet('getCVs', activeSessionId);
+  if(!res.success) return;
+  cvs=res.data;
+  const myGroup=user.groupCode==='admin'?null:user.groupCode;
+  const filtered=myGroup?cvs.filter(c=>c.groupCode===myGroup):cvs;
+  $('board-title').textContent=myGroup?`${myGroup} 모둠`:'전체';
+  renderChart(filtered);
+  renderCards(filtered);
+}
+
+function renderChart(list){
+  const cats={env:{label:'환경 변수',color:'var(--cyan)',cnt:0},prep:{label:'준비 부족',color:'var(--pink)',cnt:0},tech:{label:'기술 오류',color:'var(--purple)',cnt:0},student:{label:'학생 변수',color:'#38bdf8',cnt:0},other:{label:'기타',color:'#a855f7',cnt:0}};
+  let total=0;
+  list.forEach(c=>(c.part2?.categories||[]).forEach(k=>{ if(cats[k]){ cats[k].cnt++; total++; } }));
+  const el=$('cat-chart');
+  if(!total){ el.innerHTML='<div class="text-xxs text-dim text-center" style="padding:12px">데이터 없음</div>'; return; }
+  el.innerHTML=Object.keys(cats).map(k=>{
+    const c=cats[k], pct=total>0?Math.round(c.cnt/total*100):0;
+    return `<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:.72rem;margin-bottom:3px"><span style="color:var(--t2)">${c.label}</span><span style="color:var(--t3)">${c.cnt}건 (${pct}%)</span></div><div class="prog-bar"><div class="prog-fill" style="width:${pct}%;background:${c.color}"></div></div></div>`;
+  }).join('');
+}
+
+function renderCards(list){
+  const grid=$('board-grid');
+  if(!list.length){ grid.innerHTML='<div class="glass text-center fade-in" style="padding:32px;grid-column:1/-1"><div style="font-size:2rem;margin-bottom:10px">📭</div><div class="text-sm text-muted">아직 제출된 이력서가 없습니다.</div></div>'; return; }
+  grid.innerHTML=list.map(cv=>cardHTML(cv)).join('');
+}
+
+function cardHTML(cv){
+  const isMe=cv.cvId==='CV-'+user.voterId;
+  const tags=(cv.part2?.categories||[]).map(c=>{
+    const m={env:'환경 변수',prep:'준비 부족',tech:'기술 오류',student:'학생 변수',other:'기타'};
+    return `<span class="tag tag-cyan" style="pointer-events:none;font-size:.65rem">${m[c]||c}</span>`;
+  }).join('');
+  return `<div class="flip-wrap" id="fw-${cv.cvId}" onclick="flipCard('${cv.cvId}')">
+  <div class="flip-inner">
+    <div class="flip-front glass" style="padding:20px;background:rgba(18,9,46,.6);display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden">
+      <div class="card-top-bar"></div>
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <span style="font-size:.7rem;color:var(--cyan)">${cv.school}</span>
+          <span style="font-size:.68rem;border:1px solid rgba(255,255,255,.1);padding:2px 7px;border-radius:6px;color:var(--t2)">${isMe?'내 카드':cv.authorName+' 교사'}</span>
+        </div>
+        <div style="font-size:.95rem;font-weight:900;margin-bottom:8px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${cv.part1.projectName}</div>
+        <div style="font-size:.78rem;color:var(--t2);line-height:1.6;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden">${cv.part1.story}</div>
+      </div>
+      <div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px">${tags}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(255,255,255,.05);padding-top:10px;font-size:.72rem;color:var(--t2)">
+          <span>❤️ <strong style="color:var(--t1)">${cv.empathyCount||0}</strong> &nbsp; 💬 <strong style="color:var(--t1)">${(cv.comments||[]).length}</strong></span>
+          <span style="color:var(--cyan);font-size:.65rem;animation:pulse 2s infinite">클릭해서 뒤집기 »</span>
+        </div>
+      </div>
+    </div>
+    <div class="flip-back glass" style="background:rgba(6,9,30,.97);border-color:rgba(6,182,212,.25);display:flex;flex-direction:column;overflow:hidden;position:relative" onclick="event.stopPropagation()">
+      <div style="padding:16px;overflow-y:auto;flex:1">
+        <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,.05);padding-bottom:8px;margin-bottom:10px">
+          <span style="font-size:.68rem;font-weight:700;color:var(--cyan);letter-spacing:.08em">사망 진단서 (5 WHYS)</span>
+          <button onclick="flipCard('${cv.cvId}')" style="font-size:.65rem;color:var(--purple);background:none;border:none;cursor:pointer;font-family:inherit">« 앞면으로</button>
+        </div>
+        <div style="margin-bottom:10px"><span style="font-size:.65rem;font-weight:700;color:var(--pink)">표면 원인</span><div style="font-size:.72rem;color:var(--t2);margin-top:2px;padding-left:8px;border-left:2px solid rgba(236,72,153,.3)">${cv.part2?.surfaceCause||'미기재'}</div></div>
+        ${(cv.part2?.fiveWhys||[]).filter(w=>w).map((w,i)=>`<div style="font-size:.7rem;color:var(--t2);margin-bottom:4px;padding-left:${i*8+6}px"><span style="color:var(--cyan)">Why ${i+1}:</span> ${w}</div>`).join('')}
+        <div class="divider"></div>
+        <div style="margin-bottom:6px"><span style="font-size:.65rem;font-weight:700;color:var(--green)">배운 점</span><div style="font-size:.72rem;color:var(--t2);margin-top:2px">${cv.part3?.lesson||'미기재'}</div></div>
+        <div><span style="font-size:.65rem;font-weight:700;color:var(--cyan)">Plan B</span><div style="font-size:.72rem;color:var(--t2);margin-top:2px">${cv.part3?.planB||'미기재'}</div></div>
+        <div class="divider"></div>
+        <div style="font-size:.65rem;font-weight:700;color:var(--purple);margin-bottom:6px">동료 피드백 (${(cv.comments||[]).length})</div>
+        <div style="max-height:70px;overflow-y:auto;background:rgba(0,0,0,.2);padding:6px;border-radius:8px;margin-bottom:8px">${(cv.comments||[]).length?cv.comments.map(c=>`<div style="font-size:.68rem;color:var(--t2);border-bottom:1px solid rgba(255,255,255,.04);padding-bottom:4px;margin-bottom:4px">${c.text}</div>`).join(''):'<div style="font-size:.65rem;color:var(--t3);text-align:center;padding:8px">댓글이 없습니다.</div>'}</div>
+      </div>
+      <div style="padding:10px 14px;border-top:1px solid rgba(255,255,255,.05);display:flex;gap:6px">
+        <button onclick="doEmpathy('${cv.cvId}')" style="padding:7px 12px;border-radius:9px;background:rgba(236,72,153,.1);border:1px solid rgba(236,72,153,.25);color:var(--pink);cursor:pointer;font-size:.75rem;font-weight:700;font-family:inherit;transition:all .2s" onmouseover="this.style.background='var(--pink)';this.style.color='#fff'" onmouseout="this.style.background='rgba(236,72,153,.1)';this.style.color='var(--pink)'">❤️ ${cv.empathyCount||0}</button>
+        <input class="inp" style="flex:1;padding:7px 10px;font-size:.72rem" placeholder="한 줄 피드백 (50자)" maxlength="50" id="cmt-${cv.cvId}" onclick="event.stopPropagation()"/>
+        <button onclick="doComment('${cv.cvId}')" style="padding:7px 12px;border-radius:9px;background:var(--cyan);border:none;color:#0b061a;cursor:pointer;font-size:.72rem;font-weight:700;font-family:inherit">전송</button>
+      </div>
+    </div>
+  </div></div>`;
+}
+
+function flipCard(id){ document.getElementById('fw-'+id)?.classList.toggle('flipped'); }
+
+async function doEmpathy(cvId){
+  await gasPost('empathy', activeSessionId, {cvId});
+  await loadBoard();
+  toast('❤️ 공감을 보냈습니다!');
+}
+async function doComment(cvId){
+  const inp=$('cmt-'+cvId); if(!inp||!inp.value.trim()) return;
+  await gasPost('comment', activeSessionId, {cvId, commentText:inp.value.trim()});
+  inp.value=''; await loadBoard(); toast('💬 댓글이 등록되었습니다!');
+}
+
+// ============================================================
+// 투표
+// ============================================================
+async function loadVote(){
+  const [cvRes, voteRes]=await Promise.all([gasGet('getCVs',activeSessionId), gasGet('getVotes',activeSessionId)]);
+  cvs=cvRes.success?cvRes.data:[];
+  votes=voteRes.success?voteRes.data:[];
+  const isVoted=votes.some(v=>v.voterId===user.voterId);
+  $('vote-form').style.display=isVoted?'none':'block';
+  $('vote-waiting').style.display=isVoted?'block':'none';
+  if(!isVoted) renderVoteForm();
+  refreshVoteProgress();
+}
+function renderVoteForm(){
+  const myGroup=user.groupCode==='admin'?null:user.groupCode;
+  const pool=myGroup?cvs.filter(c=>c.groupCode===myGroup):cvs;
+  $('vote-categories').innerHTML=(session?.awardCategories||AWARD_CATS).map(cat=>`
+    <div class="glass fade-in" style="padding:18px;margin-bottom:14px;border-color:rgba(236,72,153,.1)">
+      <div style="border-bottom:1px solid rgba(255,255,255,.05);padding-bottom:10px;margin-bottom:12px">
+        <div style="font-size:.95rem;font-weight:900;color:var(--pink)">🏆 ${cat.name}</div>
+        <div style="font-size:.72rem;color:var(--t2);margin-top:4px;font-style:italic">"${cat.desc}"</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">${pool.map(cv=>{
+    const isSelf=cv.cvId==='CV-'+user.voterId;
+    return `<label style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:10px;border:1px solid ${isSelf?'rgba(255,255,255,.04)':'rgba(255,255,255,.07)'};cursor:${isSelf?'not-allowed':'pointer'};opacity:${isSelf?.4:1};transition:all .2s;background:rgba(255,255,255,.02)" ${isSelf?'':'onmouseover="this.style.background=\'rgba(255,255,255,.05)\'" onmouseout="this.style.background=\'rgba(255,255,255,.02)\'"'}>
+      <div><div style="font-size:.82rem;font-weight:700">${cv.part1.projectName}</div><div style="font-size:.68rem;color:var(--t2);margin-top:2px">${cv.school} · ${cv.authorName} 교사${isSelf?' (나)':''}</div></div>
+      <input type="radio" name="${cat.id}" value="${cv.cvId}" ${isSelf?'disabled':''} style="width:16px;height:16px;accent-color:var(--pink)" onchange="voteSelections['${cat.id}']='${cv.cvId}'"/>
+    </label>`;
+  }).join('')}</div></div>`).join('');
+}
+async function refreshVoteProgress(){
+  const voteRes=await gasGet('getVotes', activeSessionId);
+  if(voteRes.success) votes=voteRes.data;
+  const total=cvs.length, voted=votes.length;
+  const pct=total>0?Math.min(100,Math.round(voted/total*100)):0;
+  $('vote-progress-text').textContent=`${voted} / ${total}명`;
+  $('vote-prog').style.width=pct+'%';
+}
+async function submitVote(){
+  const cats=(session?.awardCategories||AWARD_CATS).map(c=>c.id);
+  for(const catId of cats){
+    if(!voteSelections[catId]){ toast('모든 부문에 투표해 주세요.'); return; }
+  }
+  const selections=Object.keys(voteSelections).map(catId=>({categoryId:catId,cvId:voteSelections[catId]}));
+  $('vote-spinner').style.display='inline-block'; $('vote-submit-btn').disabled=true;
+  try{
+    const res=await gasPost('submitVote', activeSessionId, {voterId:user.voterId, selections});
+    if(res.success){ toast('✅ 투표가 제출되었습니다!'); loadVote(); }
+    else toast('투표 실패: '+res.error);
+  } catch(e){ toast('오류: '+e.message); }
+  finally{ $('vote-spinner').style.display='none'; $('vote-submit-btn').disabled=false; }
+}
+
+// ============================================================
+// 시상 결과
+// ============================================================
+async function loadResults(){
+  const [cvRes, resRes]=await Promise.all([gasGet('getCVs',activeSessionId), gasGet('getResults',activeSessionId)]);
+  if(cvRes.success) cvs=cvRes.data;
+  if(!resRes.success) return;
+  results=resRes.results||[];
+  renderResults();
+}
+function renderResults(){
+  const status=session?.status||'closed_all';
+  let revealIdx=-1;
+  if(status==='closed_0') revealIdx=0;
+  else if(status==='closed_1') revealIdx=1;
+  else if(status==='closed_2') revealIdx=2;
+  else if(status==='closed_all') revealIdx=99;
+
+  const cvMap={};
+  cvs.forEach(c=>cvMap[c.cvId]=c);
+
+  $('result-list').innerHTML=results.map((res,i)=>{
+    const revealed=revealIdx===99||i<=revealIdx;
+    if(!revealed) return `<div class="glass fade-in" style="padding:28px;margin-bottom:14px;border-style:dashed;opacity:.4;text-align:center;min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center"><div style="font-size:1.5rem;margin-bottom:8px">🔒</div><div class="font-bold text-muted">${res.categoryName}</div><div class="text-xxs text-dim mt2">퍼실리테이터가 봉투를 개봉 중입니다...</div></div>`;
+    const hasWinners=res.winners?.length>0;
+    return `<div class="glass winner-card fade-in" style="padding:20px 22px;margin-bottom:16px">
+      <div style="display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,.06);padding-bottom:12px;margin-bottom:14px">
+        <div style="width:40px;height:40px;border-radius:50%;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);display:flex;align-items:center;justify-content:center;font-size:1.1rem">🏆</div>
+        <div><div style="font-size:1rem;font-weight:900;color:var(--green)">${res.categoryName}</div><div class="text-xxs text-dim" style="margin-top:2px">총 ${res.voteCount}표 득표</div></div>
+        ${i===revealIdx?`<button onclick="fireConfetti()" style="margin-left:auto;padding:4px 12px;border-radius:999px;background:var(--green);border:none;color:#0b061a;font-size:.7rem;font-weight:700;cursor:pointer;font-family:inherit">🎉 폭죽</button>`:''}
+      </div>
+      ${!hasWinners?'<div class="text-sm text-dim text-center" style="padding:12px">해당 부문 득표자가 없습니다.</div>':
+        res.winners.map(w=>{
+          const full=cvMap[w.cvId];
+          return `<div style="background:rgba(16,185,129,.04);border:1px solid rgba(16,185,129,.15);border-radius:14px;padding:14px 16px">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+              <span class="chip chip-green">🏆 ${w.votes}표 수상</span>
+              <span class="text-xxs text-dim">${w.school}</span>
+            </div>
+            <div style="font-size:1.05rem;font-weight:900;margin-bottom:4px">${w.authorName} <span style="font-size:.8rem;font-weight:400;color:var(--t2)">교사</span></div>
+            <div class="text-xs text-cyan" style="margin-bottom:10px;font-weight:700">${w.projectName}</div>
+            ${full?`<div style="font-size:.72rem;color:var(--t2);line-height:1.7;border-top:1px solid rgba(255,255,255,.05);padding-top:8px;font-style:italic">"${full.part1.story.slice(0,120)}${full.part1.story.length>120?'...':''}"</div>
+            <div style="margin-top:8px;font-size:.68rem;background:rgba(0,0,0,.2);padding:8px 10px;border-radius:8px"><span style="font-weight:700;color:var(--green)">💡 극복 교훈:</span> ${(full.part3?.lesson||'').slice(0,100)}</div>`:''}
+          </div>`;
+        }).join('')}
+    </div>`;
+  }).join('');
+}
+
+function fireConfetti(){
+  confetti({particleCount:80,angle:60,spread:55,origin:{x:0}});
+  confetti({particleCount:80,angle:120,spread:55,origin:{x:1}});
+}
+
+// ============================================================
+// 관리자
+// ============================================================
+function goAdmin(){ show('s-admin'); adminRefresh(); }
+
+async function adminRefresh(){
+  if(!activeSessionId){ activeSessionId=$('admin-sid').value||'demo'; }
+  try{
+    const [sessRes, cvRes, voteRes, resRes]=await Promise.all([
+      gasGet('getSession', activeSessionId),
+      gasGet('getCVs', activeSessionId),
+      gasGet('getVotes', activeSessionId),
+      gasGet('getResults', activeSessionId)
+    ]);
+    if(sessRes.success){ session=sessRes.data; updateStageBtns(session.status); $('stat-status').textContent=session.status; }
+    if(cvRes.success){ cvs=cvRes.data; $('stat-cvs').textContent=cvs.length; }
+    if(voteRes.success){ votes=voteRes.data; $('stat-votes').textContent=votes.length; }
+    if(resRes.success){ results=resRes.results||[]; renderAdminResults(); }
+  } catch(e){ toast('동기화 실패: '+e.message); }
+}
+function updateStageBtns(status){
+  document.querySelectorAll('.stage-btn').forEach(b=>{ b.classList.toggle('active', b.dataset.status===status); });
+}
+async function changeStatus(status){
+  if(!activeSessionId) activeSessionId=$('admin-sid').value||'demo';
+  await gasPost('updateSessionStatus', activeSessionId, {status});
+  session=session||{}; session.status=status;
+  updateStageBtns(status);
+  $('stat-status').textContent=status;
+  toast('단계 변경: '+status);
+  await adminRefresh();
+}
+function renderAdminResults(){
+  if(!results.length){ $('admin-results-preview').innerHTML='<div class="text-dim text-xxs">집계 데이터가 없습니다.</div>'; return; }
+  $('admin-results-preview').innerHTML=results.map(r=>`<div style="margin-bottom:10px"><div class="text-xs font-bold text-purple" style="margin-bottom:4px">${r.categoryName}</div>${r.winners.length?r.winners.map(w=>`<div style="font-size:.72rem;display:flex;justify-content:space-between;padding:2px 0;color:var(--t2)"><span>${w.school} · ${w.authorName} (${w.projectName})</span><strong style="color:var(--cyan)">${w.votes}표</strong></div>`).join(''):'<span class="text-dim text-xxs">득표 없음</span>'}</div>`).join('');
+}
+async function createSession(){
+  const sid=$('admin-sid').value.trim(), title=$('admin-stitle').value.trim();
+  const groups=$('admin-groups').value.split(',').map((g,i)=>({groupCode:String(101+i),groupName:g.trim()}));
+  if(!sid||!title){ toast('세션 ID와 연수명을 입력해 주세요.'); return; }
+  activeSessionId=sid; localStorage.setItem(KEYS.SID, sid);
+  const res=await gasPost('createSession', sid, {title, groups, awardCategories:AWARD_CATS});
+  if(res.success){ toast('✅ 세션이 등록되었습니다!'); adminRefresh(); }
+  else toast('세션 생성 실패: '+res.error);
+}
+function saveGasUrl(){
+  const url=$('admin-gas-url').value.trim();
+  localStorage.setItem(KEYS.GAS, url||'');
+  updateDemoBadge();
+  toast(url?'✅ GAS URL이 저장되었습니다.':'🔄 데모 모드로 전환되었습니다.');
+}
+
+// ============================================================
+// 공통
+// ============================================================
+function doExit(){
+  stopPolling(); session=null;
+  goScreen('s-entry');
+}
+function goScreen(id){ show(id); }
+
+// 모바일 레이아웃 대응
+function adjustLayout(){
+  const w=window.innerWidth;
+  const bl=$('board-layout'), al=$('admin-layout');
+  if(bl){
+    if(w<640){ bl.style.gridTemplateColumns='1fr'; }
+    else { bl.style.gridTemplateColumns='1fr 2fr'; }
+  }
+  if(al){
+    if(w<700){ al.style.gridTemplateColumns='1fr'; }
+    else { al.style.gridTemplateColumns='280px 1fr'; }
+  }
+}
+window.addEventListener('resize', adjustLayout);
+document.addEventListener('DOMContentLoaded', adjustLayout);
+</script>
+</body>
 </html>
-
-
