@@ -1,0 +1,326 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Outfit:wght@300;400;600;800&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap');
+
+:root {
+  --bg-space: #0b061a;
+  --bg-deep: #12092e;
+  --panel-glass: rgba(18, 9, 46, 0.65);
+  --border-glass: rgba(139, 92, 246, 0.2);
+  --border-glass-hover: rgba(6, 182, 212, 0.4);
+  
+  --primary-neon: #8b5cf6; /* Electric Purple */
+  --primary-neon-glow: rgba(139, 92, 246, 0.6);
+  --secondary-neon: #06b6d4; /* Neon Cyan */
+  --secondary-neon-glow: rgba(6, 182, 212, 0.6);
+  --accent-pink: #ec4899; /* Sunset Pink */
+  --accent-pink-glow: rgba(236, 72, 153, 0.6);
+  --success-emerald: #10b981;
+  
+  --text-primary: #f3f4f6;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+
+  font-family: 'Outfit', 'Noto Sans KR', sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: dark;
+  background-color: var(--bg-space);
+  color: var(--text-primary);
+  
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+  background: radial-gradient(circle at 50% 30%, #20144c 0%, #06020e 100%);
+  background-attachment: fixed;
+  overflow-x: hidden;
+}
+
+/* 스크롤바 커스텀 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(11, 6, 26, 0.5);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-glass);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-neon);
+}
+
+/* Glassmorphism 카드 */
+.glass-panel {
+  background: var(--panel-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-glass);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.glass-panel:hover {
+  border-color: var(--border-glass-hover);
+  box-shadow: 0 12px 40px 0 rgba(6, 182, 212, 0.15);
+}
+
+/* 폼 인풋 및 컨트롤 */
+.glass-input {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  color: var(--text-primary);
+  padding: 12px 16px;
+  outline: none;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.glass-input:focus {
+  border-color: var(--secondary-neon);
+  box-shadow: 0 0 10px var(--secondary-neon-glow);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.glass-input::placeholder {
+  color: var(--text-muted);
+}
+
+/* 네온 버튼 */
+.neon-btn {
+  position: relative;
+  background: transparent;
+  color: var(--text-primary);
+  border: 2px solid var(--primary-neon);
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.2);
+}
+
+.neon-btn:hover {
+  background: var(--primary-neon);
+  box-shadow: 0 0 20px var(--primary-neon-glow);
+  transform: translateY(-2px);
+}
+
+.neon-btn:active {
+  transform: translateY(0);
+}
+
+.neon-btn-cyan {
+  border-color: var(--secondary-neon);
+  box-shadow: 0 0 15px rgba(6, 182, 212, 0.2);
+}
+
+.neon-btn-cyan:hover {
+  background: var(--secondary-neon);
+  color: #0b061a;
+  box-shadow: 0 0 20px var(--secondary-neon-glow);
+}
+
+.neon-btn-pink {
+  border-color: var(--accent-pink);
+  box-shadow: 0 0 15px rgba(236, 72, 153, 0.2);
+}
+
+.neon-btn-pink:hover {
+  background: var(--accent-pink);
+  box-shadow: 0 0 20px var(--accent-pink-glow);
+}
+
+.neon-btn-secondary {
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: none;
+}
+
+.neon-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.neon-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* 폰트 브랜딩 스타일 */
+.brand-title {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 900;
+  letter-spacing: 2px;
+  background: linear-gradient(135deg, #ffffff 30%, var(--primary-neon) 70%, var(--secondary-neon) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.digital-number {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+}
+
+/* 3D 실패 이력서 카드 뒤집기 (Card Flip) */
+.flip-card {
+  background-color: transparent;
+  perspective: 1000px;
+  cursor: pointer;
+}
+
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: left;
+  transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transform-style: preserve-3d;
+}
+
+.flip-card.is-flipped .flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+.flip-card-front, .flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.flip-card-back {
+  transform: rotateY(180deg);
+}
+
+/* 5 Whys 아코디언 추가 필드 등장 애니메이션 */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    max-height: 150px;
+  }
+}
+
+.five-why-row {
+  animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  overflow: hidden;
+}
+
+/* 태그 칩 */
+.tag-chip {
+  background: rgba(139, 92, 246, 0.08);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  color: #c084fc;
+  font-size: 0.8rem;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+}
+
+.tag-chip.active {
+  background: var(--primary-neon);
+  color: var(--text-primary);
+  border-color: var(--primary-neon);
+  box-shadow: 0 0 10px var(--primary-neon-glow);
+}
+
+.tag-chip-cyan {
+  background: rgba(6, 182, 212, 0.08);
+  border: 1px solid rgba(6, 182, 212, 0.2);
+  color: #22d3ee;
+}
+.tag-chip-cyan.active {
+  background: var(--secondary-neon);
+  color: #0b061a;
+  border-color: var(--secondary-neon);
+  box-shadow: 0 0 10px var(--secondary-neon-glow);
+}
+
+.tag-chip-pink {
+  background: rgba(236, 72, 153, 0.08);
+  border: 1px solid rgba(236, 72, 153, 0.2);
+  color: #f472b6;
+}
+.tag-chip-pink.active {
+  background: var(--accent-pink);
+  color: var(--text-primary);
+  border-color: var(--accent-pink);
+  box-shadow: 0 0 10px var(--accent-pink-glow);
+}
+
+/* 로딩 스피너 */
+.spinner {
+  border: 3px solid rgba(255, 255, 255, 0.05);
+  border-top: 3px solid var(--secondary-neon);
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 공감 하트 버블 이펙트 */
+@keyframes bubbleUp {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-40px) scale(1.4);
+    opacity: 0;
+  }
+}
+
+.bubble-heart {
+  position: absolute;
+  color: var(--accent-pink);
+  pointer-events: none;
+  animation: bubbleUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 페이드 인 전환 효과 */
+.fade-enter {
+  opacity: 0;
+  transform: translateY(8px);
+}
+.fade-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.3s, transform 0.3s;
+}
