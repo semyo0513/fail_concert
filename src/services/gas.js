@@ -99,7 +99,7 @@ const DEFAULT_DEMO_DB = {
 export const getGasUrl = () => {
   const saved = localStorage.getItem(STORAGE_KEYS.GAS_URL);
   if (saved === "") return ""; // 명시적으로 비워둔 경우 데모 모드로 인식
-  return saved || 'https://script.google.com/macros/s/AKfycbwzaOOxE7JUa6KLuuxBhmTulOgSDTC2xLB_b9PkL5-IrjMRN30c_nk0QF8bjx_exyjs/exec';
+  return saved || 'https://script.google.com/macros/s/AKfycbwn5BDfJqK0Be_j5vS2vlt7XKFM7JQg_-xEsEr4qXhCTK0XPjIjtq_YfXa4oP2fcjkS/exec';
 };
 export const setGasUrl = (url) => {
   if (url !== null && url !== undefined) {
