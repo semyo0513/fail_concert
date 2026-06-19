@@ -81,11 +81,17 @@ label{display:block;font-size:.75rem;font-weight:700;color:var(--t2);margin-bott
 .tag.on.tag-pink{background:var(--pink);color:#fff;border-color:var(--pink);box-shadow:0 0 8px var(--pink-g)}
 .tag.on.tag-purple{background:var(--purple);color:#fff;border-color:var(--purple);box-shadow:0 0 8px var(--purple-g)}
 /* FLIP CARD */
-.flip-wrap{perspective:1000px;height:420px;cursor:pointer}
+.flip-wrap{perspective:1000px;height:420px;cursor:pointer;transition:height 0.3s ease}
 .flip-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .7s cubic-bezier(.175,.885,.32,1.275)}
 .flip-wrap.flipped .flip-inner{transform:rotateY(180deg)}
 .flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:20px;padding:20px}
 .flip-back{transform:rotateY(180deg)}
+/* Flipped State Layout Overrides to Auto-expand Height and Push Other Cards Down */
+.flip-wrap.flipped{height:auto;min-height:420px}
+.flip-wrap.flipped .flip-inner{height:auto;min-height:420px}
+.flip-wrap.flipped .flip-front{position:absolute !important;opacity:0;pointer-events:none;z-index:1}
+.flip-wrap.flipped .flip-back{position:relative !important;height:auto !important;min-height:420px;overflow:visible !important;z-index:2}
+.flip-wrap.flipped .card-back-content{overflow-y:visible !important;height:auto !important;flex:none !important}
 .card-top-bar{height:3px;border-radius:20px 20px 0 0;background:linear-gradient(90deg,var(--purple),var(--pink),var(--cyan));position:absolute;top:0;left:0;right:0}
 /* WHY ROW */
 .why-row{display:flex;align-items:center;gap:8px;animation:slideIn .3s ease forwards}
@@ -482,6 +488,31 @@ label{display:block;font-size:.75rem;font-weight:700;color:var(--t2);margin-bott
         <div class="field"><label>세션 ID</label><input class="inp" id="admin-sid" value="demo" placeholder="예: 2026-camp"/></div>
         <div class="field"><label>연수명</label><input class="inp" id="admin-stitle" value="삼현 AI 융합교육 실패학 콘서트" placeholder="예: 2026 AI 교원 연수"/></div>
         <div class="field"><label>모둠 목록 (쉼표 구분)</label><input class="inp" id="admin-groups" value="1모둠,2모둠,3모둠"/></div>
+        
+        <div class="divider" style="margin:12px 0"></div>
+        <div class="text-xs font-bold text-cyan" style="margin-bottom:10px;letter-spacing:.05em">🏆 시상명 커스터마이징</div>
+        <div class="field" style="margin-bottom:10px">
+          <label style="color:var(--pink)">시상 부문 1 (아이디: award-1)</label>
+          <div style="display:flex;gap:6px">
+            <input class="inp" id="admin-award-1-name" value="올해의 아름다운 폭망상" placeholder="시상명" style="flex:1;font-size:.78rem"/>
+            <input class="inp" id="admin-award-1-desc" value="가장 용감하게 도전했고, 가장 화려하게 실패했으나, 그 용기 자체를 기립니다." placeholder="상세 설명" style="flex:2;font-size:.78rem"/>
+          </div>
+        </div>
+        <div class="field" style="margin-bottom:10px">
+          <label style="color:var(--pink)">시상 부문 2 (아이디: award-2)</label>
+          <div style="display:flex;gap:6px">
+            <input class="inp" id="admin-award-2-name" value="불사조상" placeholder="시상명" style="flex:1;font-size:.78rem"/>
+            <input class="inp" id="admin-award-2-desc" value="멘붕의 순간, 아무도 예상 못한 방법으로 수업을 수습해낸 순발력을 기립니다." placeholder="상세 설명" style="flex:2;font-size:.78rem"/>
+          </div>
+        </div>
+        <div class="field" style="margin-bottom:14px">
+          <label style="color:var(--pink)">시상 부문 3 (아이디: award-3)</label>
+          <div style="display:flex;gap:6px">
+            <input class="inp" id="admin-award-3-name" value="인간 디버거상" placeholder="시상명" style="flex:1;font-size:.78rem"/>
+            <input class="inp" id="admin-award-3-desc" value="오류와의 처절한 사투 속에서도 끝까지 분석하고 배움을 남긴 끈기를 기립니다." placeholder="상세 설명" style="flex:2;font-size:.78rem"/>
+          </div>
+        </div>
+        
         <button class="btn btn-cyan btn-sm btn-full mt2" onclick="createSession()">세션 구글 시트 등록</button>
       </div>
     </div>
@@ -544,6 +575,7 @@ let selectedCats = [];
 let aiSolutions = [];
 let voteSelections = {};
 let pollTimer = null;
+let pollTimerActive = false;
 
 // ============================================================
 // 유틸
@@ -703,22 +735,38 @@ function routeByStatus(status){
 // ============================================================
 function startPolling(){
   stopPolling();
-  pollTimer=setInterval(async()=>{
-    if(!activeSessionId) return;
+  pollTimerActive = true;
+  
+  async function pollStep(){
+    if(!pollTimerActive || !activeSessionId) return;
     try{
       const res=await gasGet('getSession',activeSessionId);
-      if(res.success&&res.data.status!==session?.status){
+      if(res.success){
+        const statusChanged = res.data.status !== session?.status;
         session=res.data;
-        routeByStatus(session.status);
-      } else if(res.success) session=res.data;
-      // 모둠 보드 & 투표 화면 데이터 갱신
-      if(session?.status==='sharing') await loadBoard();
-      if(session?.status==='voting') await refreshVoteProgress();
-      if(session?.status&&session.status.startsWith('closed')) await loadResults();
+        if(statusChanged){
+          routeByStatus(session.status);
+        } else {
+          if(session?.status==='sharing' || $('s-board').classList.contains('active')){
+            await loadBoard();
+          } else if(session?.status==='voting'){
+            await refreshVoteProgress();
+          }
+        }
+      }
     } catch(_){}
-  }, 5000);
+    
+    if(pollTimerActive){
+      const jitter = 7000 + Math.random() * 2000;
+      pollTimer = setTimeout(pollStep, jitter);
+    }
+  }
+  pollTimer = setTimeout(pollStep, 1000);
 }
-function stopPolling(){ if(pollTimer){ clearInterval(pollTimer); pollTimer=null; } }
+function stopPolling(){
+  pollTimerActive = false;
+  if(pollTimer){ clearTimeout(pollTimer); pollTimer=null; }
+}
 
 // ============================================================
 // 이력서 작성
@@ -843,7 +891,13 @@ async function submitCV(){
       part1:{projectName:title,story}, part2:{surfaceCause:surface,fiveWhys:getWhys(),categories:selectedCats},
       part3:{lesson,planB:planb} };
     const res=await gasPost('submitCV', activeSessionId, cvData);
-    if(res.success){ localStorage.removeItem(CV_KEY()); toast('✅ 이력서가 등록되었습니다!'); }
+    if(res.success){
+      localStorage.removeItem(CV_KEY());
+      toast('✅ 이력서가 등록되었습니다!');
+      await loadBoard();
+      show('s-board');
+      startPolling();
+    }
     else toast('제출 실패: '+res.error);
   } catch(e){ toast('오류: '+e.message); }
   finally{ $('submit-spinner').style.display='none'; $('submit-btn').disabled=false; }
@@ -908,7 +962,7 @@ function cardHTML(cv){
       </div>
     </div>
     <div class="flip-back glass" style="background:rgba(6,9,30,.97);border-color:rgba(6,182,212,.25);display:flex;flex-direction:column;overflow:hidden;position:relative" onclick="event.stopPropagation()">
-      <div style="padding:16px;overflow-y:auto;flex:1">
+      <div class="card-back-content" style="padding:16px;overflow-y:auto;flex:1">
         <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,.05);padding-bottom:8px;margin-bottom:10px">
           <span style="font-size:.68rem;font-weight:700;color:var(--cyan);letter-spacing:.08em">사망 진단서 (5 WHYS)</span>
           <button onclick="flipCard('${cv.cvId}')" style="font-size:.65rem;color:var(--purple);background:none;border:none;cursor:pointer;font-family:inherit">« 앞면으로</button>
@@ -1065,7 +1119,30 @@ async function adminRefresh(){
       gasGet('getVotes', activeSessionId),
       gasGet('getResults', activeSessionId)
     ]);
-    if(sessRes.success){ session=sessRes.data; updateStageBtns(session.status); $('stat-status').textContent=session.status; }
+    if(sessRes.success){
+      session=sessRes.data;
+      updateStageBtns(session.status);
+      $('stat-status').textContent=session.status;
+      
+      const cats = session.awardCategories || AWARD_CATS;
+      if (cats && cats.length >= 3) {
+        const b0 = document.querySelector('[data-status="closed_0"]');
+        if (b0) {
+          b0.querySelector('.text-sm').textContent = '5-1. ' + (cats[0]?.name || '폭망상') + ' 공개';
+          b0.querySelector('.stage-desc').textContent = cats[0]?.desc || '';
+        }
+        const b1 = document.querySelector('[data-status="closed_1"]');
+        if (b1) {
+          b1.querySelector('.text-sm').textContent = '5-2. ' + (cats[1]?.name || '불사조상') + ' 공개';
+          b1.querySelector('.stage-desc').textContent = cats[1]?.desc || '';
+        }
+        const b2 = document.querySelector('[data-status="closed_2"]');
+        if (b2) {
+          b2.querySelector('.text-sm').textContent = '5-3. ' + (cats[2]?.name || '디버거상') + ' 공개';
+          b2.querySelector('.stage-desc').textContent = cats[2]?.desc || '';
+        }
+      }
+    }
     if(cvRes.success){ cvs=cvRes.data; $('stat-cvs').textContent=cvs.length; }
     if(voteRes.success){ votes=voteRes.data; $('stat-votes').textContent=votes.length; }
     if(resRes.success){ results=resRes.results||[]; renderAdminResults(); }
@@ -1091,8 +1168,15 @@ async function createSession(){
   const sid=$('admin-sid').value.trim(), title=$('admin-stitle').value.trim();
   const groups=$('admin-groups').value.split(',').map((g,i)=>({groupCode:String(101+i),groupName:g.trim()}));
   if(!sid||!title){ toast('세션 ID와 연수명을 입력해 주세요.'); return; }
+  
+  const awardCategories = [
+    { id: 'award-1', name: $('admin-award-1-name').value.trim() || '올해의 아름다운 폭망상', desc: $('admin-award-1-desc').value.trim() || '' },
+    { id: 'award-2', name: $('admin-award-2-name').value.trim() || '불사조상', desc: $('admin-award-2-desc').value.trim() || '' },
+    { id: 'award-3', name: $('admin-award-3-name').value.trim() || '인간 디버거상', desc: $('admin-award-3-desc').value.trim() || '' }
+  ];
+  
   activeSessionId=sid; localStorage.setItem(KEYS.SID, sid);
-  const res=await gasPost('createSession', sid, {title, groups, awardCategories:AWARD_CATS});
+  const res=await gasPost('createSession', sid, {title, groups, awardCategories});
   if(res.success){ toast('✅ 세션이 등록되었습니다!'); adminRefresh(); }
   else toast('세션 생성 실패: '+res.error);
 }
