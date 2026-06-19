@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { HelpCircle, CheckSquare, Trophy, AlertTriangle } from 'lucide-react';
+import { CheckSquare, Trophy, AlertTriangle } from 'lucide-react';
 
 export const S04_Voting = () => {
   const { cvs, votes, user, session, sendVote, isLoading } = useApp();
@@ -17,11 +17,14 @@ export const S04_Voting = () => {
   // 선택 상태 관리: { [categoryId]: cvId }
   const [selections, setSelections] = useState({});
 
-  const categories = session?.awardCategories || [
+  const categories = ((session?.awardCategories && session.awardCategories.length > 0) ? session.awardCategories : [
     { id: 'award-1', name: '올해의 아름다운 폭망상', description: '가장 용감하게 도전했고, 가장 화려하게 실패했으나, 그 용기 자체를 기립니다.' },
     { id: 'award-2', name: '불사조상', description: '멘붕의 순간, 아무도 예상 못한 방법으로 수업을 수습해낸 순발력을 기립니다.' },
     { id: 'award-3', name: '인간 디버거상', description: '오류와의 처절한 사투 속에서도 끝까지 분석하고 배움을 남긴 끈기를 기립니다.' }
-  ];
+  ]).map(c => ({
+    ...c,
+    description: c.description || c.desc || ''
+  }));
 
   const handleSelect = (categoryId, cvId) => {
     // 자기 자신 투표 방지 검증 (클라이언트 2차 방어막)

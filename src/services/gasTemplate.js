@@ -99,6 +99,8 @@ function doPost(e) {
       return createSession(postData);
     } else if (action === "updateSessionStatus") {
       return updateSessionStatus(postData);
+    } else if (action === "updateSessionAwards") {
+      return updateSessionAwards(postData);
     } else if (action === "submitCV") {
       return submitCV(postData);
     } else if (action === "empathy") {
@@ -188,6 +190,23 @@ function updateSessionStatus(data) {
       sheet.getRange(i + 1, 3).setValue(status);
       sheet.getRange(i + 1, 6).setValue(new Date().toISOString());
       return jsonResponse({ success: true, sessionId: sessionId, status: status });
+    }
+  }
+  return jsonResponse({ success: false, error: "Session not found" });
+}
+
+function updateSessionAwards(data) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName("sessions");
+  var rows = sheet.getDataRange().getValues();
+  var sessionId = data.sessionId;
+  var categoriesStr = JSON.stringify(data.awardCategories || []);
+  
+  for (var i = 1; i < rows.length; i++) {
+    if (String(rows[i][0]).trim() === String(sessionId).trim()) {
+      sheet.getRange(i + 1, 5).setValue(categoriesStr); // Column E
+      sheet.getRange(i + 1, 6).setValue(new Date().toISOString()); // Column F
+      return jsonResponse({ success: true, sessionId: sessionId });
     }
   }
   return jsonResponse({ success: false, error: "Session not found" });

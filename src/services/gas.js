@@ -214,6 +214,20 @@ export const gasApi = {
     return await fetchPost(getGasUrl(), 'updateSessionStatus', sessionId, { status });
   },
 
+  // 3-2. 시상명 업데이트
+  async updateSessionAwards(sessionId, awardCategories) {
+    if (isDemoMode()) {
+      const db = getDemoDb();
+      if (db.session.sessionId === sessionId) {
+        db.session.awardCategories = awardCategories;
+        saveDemoDb(db);
+        return { success: true };
+      }
+      return { success: false, error: '세션을 찾을 수 없습니다.' };
+    }
+    return await fetchPost(getGasUrl(), 'updateSessionAwards', sessionId, { awardCategories });
+  },
+
   // 4. 이력서 목록 조회
   async getCVs(sessionId) {
     if (isDemoMode()) {

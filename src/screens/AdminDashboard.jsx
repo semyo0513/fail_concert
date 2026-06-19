@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { GAS_SCRIPT_TEMPLATE } from '../services/gasTemplate';
-import { Play, Clipboard, Check, RefreshCw, BarChart2, Shield, Settings, Server, Copy } from 'lucide-react';
+import { Play, Clipboard, Check, RefreshCw, BarChart2, Shield, Settings, Server, Copy, Trophy } from 'lucide-react';
 
 export const AdminDashboard = ({ onNavigateToEntry }) => {
   const {
@@ -13,9 +13,9 @@ export const AdminDashboard = ({ onNavigateToEntry }) => {
     results,
     setupNewSession,
     changeSessionStatus,
+    modifySessionAwards,
     refreshData,
     isLoading,
-    error,
     activeSessionId
   } = useApp();
 
@@ -24,6 +24,46 @@ export const AdminDashboard = ({ onNavigateToEntry }) => {
   const [sessionTitle, setSessionTitle] = useState(session?.title || '삼현 AI 융합 생존 콘서트');
   const [groupInput, setGroupInput] = useState('1모둠 (AI 교과), 2모둠 (메이커 교과), 3모둠 (융합 프로젝트)');
   
+  // 신규 세션 생성용 시상명 상태
+  const [award1Name, setAward1Name] = useState('올해의 아름다운 폭망상');
+  const [award1Desc, setAward1Desc] = useState('가장 용감하게 도전했고, 가장 화려하게 실패했으나, 그 용기 자체를 기립니다.');
+  const [award2Name, setAward2Name] = useState('불사조상');
+  const [award2Desc, setAward2Desc] = useState('멘붕의 순간, 아무도 예상 못한 방법으로 수업을 수습해낸 순발력을 기립니다.');
+  const [award3Name, setAward3Name] = useState('인간 디버거상');
+  const [award3Desc, setAward3Desc] = useState('오류와의 처절한 사투 속에서도 끝까지 분석하고 배움을 남긴 끈기를 기립니다.');
+
+  // 현재 세션 시상명 실시간 수정용 상태
+  const [editAward1Name, setEditAward1Name] = useState('');
+  const [editAward1Desc, setEditAward1Desc] = useState('');
+  const [editAward2Name, setEditAward2Name] = useState('');
+  const [editAward2Desc, setEditAward2Desc] = useState('');
+  const [editAward3Name, setEditAward3Name] = useState('');
+  const [editAward3Desc, setEditAward3Desc] = useState('');
+
+  // active session 정보 로드 시 실시간 수정 필드 채우기
+  useEffect(() => {
+    const updateAwards = () => {
+      if (session?.awardCategories && session.awardCategories.length >= 3) {
+        setEditAward1Name(session.awardCategories[0]?.name || '');
+        setEditAward1Desc(session.awardCategories[0]?.desc || session.awardCategories[0]?.description || '');
+        setEditAward2Name(session.awardCategories[1]?.name || '');
+        setEditAward2Desc(session.awardCategories[1]?.desc || session.awardCategories[1]?.description || '');
+        setEditAward3Name(session.awardCategories[2]?.name || '');
+        setEditAward3Desc(session.awardCategories[2]?.desc || session.awardCategories[2]?.description || '');
+      } else {
+        setEditAward1Name('올해의 아름다운 폭망상');
+        setEditAward1Desc('가장 용감하게 도전했고, 가장 화려하게 실패했으나, 그 용기 자체를 기립니다.');
+        setEditAward2Name('불사조상');
+        setEditAward2Desc('멘붕의 순간, 아무도 예상 못한 방법으로 수업을 수습해낸 순발력을 기립니다.');
+        setEditAward3Name('인간 디버거상');
+        setEditAward3Desc('오류와의 처절한 사투 속에서도 끝까지 분석하고 배움을 남긴 끈기를 기립니다.');
+      }
+    };
+
+    const timer = setTimeout(updateAwards, 0);
+    return () => clearTimeout(timer);
+  }, [session?.awardCategories]);
+
   // GAS URL 입력 필드 상태
   const [gasUrlInput, setGasUrlInput] = useState(gasUrl);
   const [isCopied, setIsCopied] = useState(false);
@@ -44,9 +84,30 @@ export const AdminDashboard = ({ onNavigateToEntry }) => {
       return;
     }
     const groupsArray = groupInput.split(',').map(g => g.trim()).filter(Boolean);
-    const success = await setupNewSession(newSessionId.trim(), sessionTitle.trim(), groupsArray);
+    const awardCategories = [
+      { id: 'award-1', name: award1Name.trim() || '올해의 아름다운 폭망상', desc: award1Desc.trim() || '', description: award1Desc.trim() || '' },
+      { id: 'award-2', name: award2Name.trim() || '불사조상', desc: award2Desc.trim() || '', description: award2Desc.trim() || '' },
+      { id: 'award-3', name: award3Name.trim() || '인간 디버거상', desc: award3Desc.trim() || '', description: award3Desc.trim() || '' }
+    ];
+    const success = await setupNewSession(newSessionId.trim(), sessionTitle.trim(), groupsArray, awardCategories);
     if (success) {
       alert(`[${newSessionId}] 세션이 구글 시트에 성공적으로 초기화되었습니다!`);
+    }
+  };
+
+  // 2-2. 시상명 즉시 업데이트 및 반영
+  const handleUpdateAwards = async () => {
+    if (!session) return;
+    const cats = [
+      { id: 'award-1', name: editAward1Name.trim() || '올해의 아름다운 폭망상', desc: editAward1Desc.trim() || '', description: editAward1Desc.trim() || '' },
+      { id: 'award-2', name: editAward2Name.trim() || '불사조상', desc: editAward2Desc.trim() || '', description: editAward2Desc.trim() || '' },
+      { id: 'award-3', name: editAward3Name.trim() || '인간 디버거상', desc: editAward3Desc.trim() || '', description: editAward3Desc.trim() || '' }
+    ];
+    const success = await modifySessionAwards(cats);
+    if (success) {
+      alert('🏆 시상명이 즉시 변경 및 연수 환경에 반영되었습니다!');
+    } else {
+      alert('시상명 실시간 반영에 실패했습니다.');
     }
   };
 
@@ -110,34 +171,44 @@ export const AdminDashboard = ({ onNavigateToEntry }) => {
               <p className="text-xs text-gray-500 text-center py-4">동작 가능한 세션이 로드되지 않았습니다. 아래 세션 생성기를 통해 세션을 생성해 주세요.</p>
             ) : (
               <div className="flex flex-col gap-2">
-                {[
-                  { id: 'waiting', label: '1단계: 입장 대기', desc: '참가자 입장 화면 노출' },
-                  { id: 'writing', label: '2단계: 이력서 작성', desc: '이력서 입력 폼 (스텝 1~3) 오픈' },
-                  { id: 'sharing', label: '3단계: 모둠 보드 공유', desc: '모둠원 이력서 카드 및 댓글 보드 오픈' },
-                  { id: 'voting', label: '4단계: 시상 투표 오픈', desc: '투표 용지 오픈 (중복 투표 불가)' },
-                  { id: 'closed_0', label: '5-1단계: 폭망상 발표', desc: '올해의 아름다운 폭망상 결과만 공개' },
-                  { id: 'closed_1', label: '5-2단계: 불사조상 발표', desc: '불사조상 결과 추가 공개' },
-                  { id: 'closed_2', label: '5-3단계: 디버거상 발표', desc: '디버거상 결과 추가 공개' },
-                  { id: 'closed_all', label: '결과 전체 공개', desc: '모든 시상 부문 종합 공개' }
-                ].map((stage) => {
-                  const isActive = activeStatus === stage.id;
-                  return (
-                    <button
-                      key={stage.id}
-                      onClick={() => changeSessionStatus(stage.id)}
-                      className={`w-full text-left p-3 rounded-xl border transition-all flex flex-col ${
-                        isActive 
-                          ? 'bg-cyan-500 border-cyan-400 text-bg-space shadow-[0_0_12px_var(--secondary-neon-glow)] font-bold' 
-                          : 'bg-white/[0.02] border-white/5 hover:bg-white/5 hover:border-white/10'
-                      }`}
-                    >
-                      <span className="text-xs">{stage.label}</span>
-                      <span className={`text-[9px] mt-0.5 font-normal ${isActive ? 'text-bg-space/80' : 'text-gray-400'}`}>
-                        {stage.desc}
-                      </span>
-                    </button>
-                  );
-                })}
+                {(() => {
+                  const cats = (session?.awardCategories && session.awardCategories.length > 0)
+                    ? session.awardCategories
+                    : [
+                        { id: 'award-1', name: '올해의 아름다운 폭망상', desc: '가장 용감하게 도전했고, 가장 화려하게 실패했으나, 그 용기 자체를 기립니다.' },
+                        { id: 'award-2', name: '불사조상', desc: '멘붕의 순간, 아무도 예상 못한 방법으로 수업을 수습해낸 순발력을 기립니다.' },
+                        { id: 'award-3', name: '인간 디버거상', desc: '오류와의 처절한 사투 속에서도 끝까지 분석하고 배움을 남긴 끈기를 기립니다.' }
+                      ];
+                  
+                  return [
+                    { id: 'waiting', label: '1단계: 입장 대기', desc: '참가자 입장 화면 노출' },
+                    { id: 'writing', label: '2단계: 이력서 작성', desc: '이력서 입력 폼 (스텝 1~3) 오픈' },
+                    { id: 'sharing', label: '3단계: 모둠 보드 공유', desc: '모둠원 이력서 카드 및 댓글 보드 오픈' },
+                    { id: 'voting', label: '4단계: 시상 투표 오픈', desc: '투표 용지 오픈 (중복 투표 불가)' },
+                    { id: 'closed_0', label: `5-1단계: ${cats[0]?.name || '폭망상'} 발표`, desc: cats[0]?.desc || cats[0]?.description || '' },
+                    { id: 'closed_1', label: `5-2단계: ${cats[1]?.name || '불사조상'} 발표`, desc: cats[1]?.desc || cats[1]?.description || '' },
+                    { id: 'closed_2', label: `5-3단계: ${cats[2]?.name || '디버거상'} 발표`, desc: cats[2]?.desc || cats[2]?.description || '' },
+                    { id: 'closed_all', label: '결과 전체 공개', desc: '모든 시상 결과 공개' }
+                  ].map((stage) => {
+                    const isActive = activeStatus === stage.id;
+                    return (
+                      <button
+                        key={stage.id}
+                        onClick={() => changeSessionStatus(stage.id)}
+                        className={`w-full text-left p-3 rounded-xl border transition-all flex flex-col ${
+                          isActive 
+                            ? 'bg-cyan-500 border-cyan-400 text-bg-space shadow-[0_0_12px_var(--secondary-neon-glow)] font-bold' 
+                            : 'bg-white/[0.02] border-white/5 hover:bg-white/5 hover:border-white/10'
+                        }`}
+                      >
+                        <span className="text-xs">{stage.label}</span>
+                        <span className={`text-[9px] mt-0.5 font-normal ${isActive ? 'text-bg-space/80' : 'text-gray-400'}`}>
+                          {stage.desc}
+                        </span>
+                      </button>
+                    );
+                  });
+                })()}
               </div>
             )}
           </div>
@@ -172,6 +243,86 @@ export const AdminDashboard = ({ onNavigateToEntry }) => {
               {saveStatus && <p className="text-[10px] text-center text-emerald-400 font-bold">{saveStatus}</p>}
             </div>
           </div>
+
+          {/* 현재 세션 시상명 실시간 수정 */}
+          {session && (
+            <div className="glass-panel p-6 bg-slate-900/40 flex flex-col gap-4">
+              <h3 className="text-sm font-bold text-pink-400 uppercase tracking-wider flex items-center gap-2">
+                <Trophy size={14} />
+                <span>🏆 현재 세션 시상명 실시간 수정</span>
+              </h3>
+              
+              <div className="flex flex-col gap-3.5">
+                <div className="flex flex-col gap-1">
+                  <label className="text-[9px] font-bold text-pink-400">시상 부문 1 (award-1)</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="시상명"
+                      value={editAward1Name}
+                      onChange={(e) => setEditAward1Name(e.target.value)}
+                      className="glass-input text-[10px] py-1.5 px-3 flex-1"
+                    />
+                    <input
+                      type="text"
+                      placeholder="상세 설명"
+                      value={editAward1Desc}
+                      onChange={(e) => setEditAward1Desc(e.target.value)}
+                      className="glass-input text-[10px] py-1.5 px-3 flex-[2]"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="text-[9px] font-bold text-pink-400">시상 부문 2 (award-2)</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="시상명"
+                      value={editAward2Name}
+                      onChange={(e) => setEditAward2Name(e.target.value)}
+                      className="glass-input text-[10px] py-1.5 px-3 flex-1"
+                    />
+                    <input
+                      type="text"
+                      placeholder="상세 설명"
+                      value={editAward2Desc}
+                      onChange={(e) => setEditAward2Desc(e.target.value)}
+                      className="glass-input text-[10px] py-1.5 px-3 flex-[2]"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="text-[9px] font-bold text-pink-400">시상 부문 3 (award-3)</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="시상명"
+                      value={editAward3Name}
+                      onChange={(e) => setEditAward3Name(e.target.value)}
+                      className="glass-input text-[10px] py-1.5 px-3 flex-1"
+                    />
+                    <input
+                      type="text"
+                      placeholder="상세 설명"
+                      value={editAward3Desc}
+                      onChange={(e) => setEditAward3Desc(e.target.value)}
+                      className="glass-input text-[10px] py-1.5 px-3 flex-[2]"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleUpdateAwards}
+                  className="neon-btn neon-btn-pink w-full py-2 text-xs mt-1"
+                >
+                  시상명 즉시 변경 및 반영
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* ==========================================
@@ -273,6 +424,70 @@ export const AdminDashboard = ({ onNavigateToEntry }) => {
                 onChange={(e) => setGroupInput(e.target.value)}
                 className="glass-input text-xs py-2 px-3"
               />
+            </div>
+
+            <div className="border-t border-white/5 pt-3 flex flex-col gap-3">
+              <h4 className="text-[10px] font-bold text-cyan-400 uppercase tracking-wider">🏆 신규 세션 시상명 커스터마이징</h4>
+              
+              <div className="flex flex-col gap-1">
+                <label className="text-[9px] font-bold text-gray-500">시상 부문 1 (award-1)</label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="시상명"
+                    value={award1Name}
+                    onChange={(e) => setAward1Name(e.target.value)}
+                    className="glass-input text-[10px] py-1.5 px-3 flex-1"
+                  />
+                  <input
+                    type="text"
+                    placeholder="상세 설명"
+                    value={award1Desc}
+                    onChange={(e) => setAward1Desc(e.target.value)}
+                    className="glass-input text-[10px] py-1.5 px-3 flex-[2]"
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-[9px] font-bold text-gray-500">시상 부문 2 (award-2)</label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="시상명"
+                    value={award2Name}
+                    onChange={(e) => setAward2Name(e.target.value)}
+                    className="glass-input text-[10px] py-1.5 px-3 flex-1"
+                  />
+                  <input
+                    type="text"
+                    placeholder="상세 설명"
+                    value={award2Desc}
+                    onChange={(e) => setAward2Desc(e.target.value)}
+                    className="glass-input text-[10px] py-1.5 px-3 flex-[2]"
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-[9px] font-bold text-gray-500">시상 부문 3 (award-3)</label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="시상명"
+                    value={award3Name}
+                    onChange={(e) => setAward3Name(e.target.value)}
+                    className="glass-input text-[10px] py-1.5 px-3 flex-1"
+                  />
+                  <input
+                    type="text"
+                    placeholder="상세 설명"
+                    value={award3Desc}
+                    onChange={(e) => setAward3Desc(e.target.value)}
+                    className="glass-input text-[10px] py-1.5 px-3 flex-[2]"
+                  />
+                </div>
+              </div>
             </div>
 
             <button

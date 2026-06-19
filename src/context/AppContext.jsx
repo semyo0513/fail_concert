@@ -137,7 +137,7 @@ export const AppProvider = ({ children }) => {
   // ==========================================
 
   // 1. 세션 생성 / 초기화 (관리자용)
-  const setupNewSession = async (sessionId, title, groups) => {
+  const setupNewSession = async (sessionId, title, groups, awardCategories) => {
     setIsLoading(true);
     setError('');
     try {
@@ -146,7 +146,7 @@ export const AppProvider = ({ children }) => {
         groupName: g.trim()
       }));
       
-      const res = await gasApi.createSession(sessionId, title, formattedGroups);
+      const res = await gasApi.createSession(sessionId, title, formattedGroups, awardCategories);
       if (res.success) {
         setActiveSessionId(sessionId);
         localStorage.setItem('failure_cv_active_session_id', sessionId);
@@ -176,6 +176,29 @@ export const AppProvider = ({ children }) => {
       }
     } catch (err) {
       console.error('Failed to change session status:', err);
+    }
+  };
+
+  // 2-2. 시상명 즉시 업데이트 (관리자용)
+  const modifySessionAwards = async (awardCategories) => {
+    if (!activeSessionId) return false;
+    setIsLoading(true);
+    setError('');
+    try {
+      const res = await gasApi.updateSessionAwards(activeSessionId, awardCategories);
+      if (res.success) {
+        setSession(prev => prev ? { ...prev, awardCategories } : null);
+        await refreshData();
+        return true;
+      } else {
+        setError(res.error || '시상명 업데이트에 실패했습니다.');
+        return false;
+      }
+    } catch (err) {
+      setError('서버 연결 실패: ' + err.message);
+      return false;
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -333,6 +356,7 @@ export const AppProvider = ({ children }) => {
         enterSession,
         setupNewSession,
         changeSessionStatus,
+        modifySessionAwards,
         submitMyCV,
         sendEmpathy,
         sendComment,
