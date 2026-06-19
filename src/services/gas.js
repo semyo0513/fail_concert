@@ -96,15 +96,20 @@ const DEFAULT_DEMO_DB = {
 };
 
 // 로컬 스토리지 헬퍼
-export const getGasUrl = () => localStorage.getItem(STORAGE_KEYS.GAS_URL) || '';
+export const getGasUrl = () => {
+  const saved = localStorage.getItem(STORAGE_KEYS.GAS_URL);
+  if (saved === "") return ""; // 명시적으로 비워둔 경우 데모 모드로 인식
+  return saved || 'https://script.google.com/macros/s/AKfycbwMTegdCcobI65s85sNQrgWFZfIc-M6lpETNh4uIdU_JF9B1TzPt1bsBIDtGp27Vpyp/exec';
+};
 export const setGasUrl = (url) => {
-  if (url) {
+  if (url !== null && url !== undefined) {
     localStorage.setItem(STORAGE_KEYS.GAS_URL, url.trim());
   } else {
     localStorage.removeItem(STORAGE_KEYS.GAS_URL);
   }
 };
 export const isDemoMode = () => !getGasUrl();
+
 
 // 데모용 DB 가져오기
 const getDemoDb = () => {
