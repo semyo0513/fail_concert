@@ -126,7 +126,7 @@ function getSession(sessionId) {
   
   var data = sheet.getDataRange().getValues();
   for (var i = 1; i < data.length; i++) {
-    if (data[i][0] === sessionId) {
+    if (String(data[i][0]).trim() === String(sessionId).trim()) {
       return jsonResponse({
         success: true,
         data: {
@@ -161,7 +161,7 @@ function createSession(data) {
   var rows = sheet.getDataRange().getValues();
   var rowIndex = -1;
   for (var i = 1; i < rows.length; i++) {
-    if (rows[i][0] === sessionId) {
+    if (String(rows[i][0]).trim() === String(sessionId).trim()) {
       rowIndex = i + 1; // 1-based index
       break;
     }
@@ -184,7 +184,7 @@ function updateSessionStatus(data) {
   var status = data.status;
   
   for (var i = 1; i < rows.length; i++) {
-    if (rows[i][0] === sessionId) {
+    if (String(rows[i][0]).trim() === String(sessionId).trim()) {
       sheet.getRange(i + 1, 3).setValue(status);
       sheet.getRange(i + 1, 6).setValue(new Date().toISOString());
       return jsonResponse({ success: true, sessionId: sessionId, status: status });
@@ -201,18 +201,30 @@ function getCVs(sessionId) {
   var rows = sheet.getDataRange().getValues();
   var list = [];
   for (var i = 1; i < rows.length; i++) {
-    if (rows[i][1] === sessionId) {
+    if (String(rows[i][1]).trim() === String(sessionId).trim()) {
+      var part1 = {};
+      try { part1 = JSON.parse(rows[i][5] || "{}"); } catch(e) { part1 = { projectName: String(rows[i][5]), story: "" }; }
+      
+      var part2 = {};
+      try { part2 = JSON.parse(rows[i][6] || "{}"); } catch(e) { part2 = { surfaceCause: String(rows[i][6]), fiveWhys: [], categories: [] }; }
+      
+      var part3 = {};
+      try { part3 = JSON.parse(rows[i][7] || "{}"); } catch(e) { part3 = { lesson: String(rows[i][7]), planB: "" }; }
+      
+      var comments = [];
+      try { comments = JSON.parse(rows[i][9] || "[]"); } catch(e) { comments = []; }
+
       list.push({
         cvId: rows[i][0],
         sessionId: rows[i][1],
         groupCode: rows[i][2],
         authorName: rows[i][3],
         school: rows[i][4],
-        part1: JSON.parse(rows[i][5] || "{}"),
-        part2: JSON.parse(rows[i][6] || "{}"),
-        part3: JSON.parse(rows[i][7] || "{}"),
+        part1: part1,
+        part2: part2,
+        part3: part3,
         empathyCount: Number(rows[i][8] || 0),
-        comments: JSON.parse(rows[i][9] || "[]"),
+        comments: comments,
         createdAt: rows[i][10]
       });
     }
@@ -302,7 +314,7 @@ function getVotes(sessionId) {
   var rows = sheet.getDataRange().getValues();
   var list = [];
   for (var i = 1; i < rows.length; i++) {
-    if (rows[i][1] === sessionId) {
+    if (String(rows[i][1]).trim() === String(sessionId).trim()) {
       list.push({
         voteId: rows[i][0],
         sessionId: rows[i][1],
@@ -330,7 +342,7 @@ function submitVote(data) {
   var rows = sheet.getDataRange().getValues();
   var rowIndex = -1;
   for (var i = 1; i < rows.length; i++) {
-    if (rows[i][1] === sessionId && rows[i][2] === voterId) {
+    if (String(rows[i][1]).trim() === String(sessionId).trim() && String(rows[i][2]).trim() === String(voterId).trim()) {
       rowIndex = i + 1; // 1인 1투표 중복 방지 (기존 투표 덮어쓰기)
       break;
     }
@@ -353,7 +365,7 @@ function getResults(sessionId) {
   var sessionRows = sessionSheet ? sessionSheet.getDataRange().getValues() : [];
   var targetSession = null;
   for (var i = 1; i < sessionRows.length; i++) {
-    if (sessionRows[i][0] === sessionId) {
+    if (String(sessionRows[i][0]).trim() === String(sessionId).trim()) {
       targetSession = {
         sessionId: sessionRows[i][0],
         awardCategories: JSON.parse(sessionRows[i][4] || "[]")
@@ -370,12 +382,15 @@ function getResults(sessionId) {
   var cvRows = cvsSheet ? cvsSheet.getDataRange().getValues() : [];
   var cvMap = {};
   for (var i = 1; i < cvRows.length; i++) {
-    if (cvRows[i][1] === sessionId) {
+    if (String(cvRows[i][1]).trim() === String(sessionId).trim()) {
+      var projName = "미정";
+      try { projName = JSON.parse(cvRows[i][5] || "{}").projectName || "미정"; } catch(e) { projName = String(cvRows[i][5]); }
+      
       cvMap[cvRows[i][0]] = {
         cvId: cvRows[i][0],
         authorName: cvRows[i][3],
         school: cvRows[i][4],
-        projectName: JSON.parse(cvRows[i][5] || "{}").projectName || "미정"
+        projectName: projName
       };
     }
   }
@@ -391,7 +406,7 @@ function getResults(sessionId) {
   
   // 투표 순회하며 카운트
   for (var i = 1; i < voteRows.length; i++) {
-    if (voteRows[i][1] === sessionId) {
+    if (String(voteRows[i][1]).trim() === String(sessionId).trim()) {
       var selections = JSON.parse(voteRows[i][3] || "[]");
       selections.forEach(function(sel) {
         var catId = sel.categoryId;
