@@ -857,7 +857,7 @@ async function loadBoard(){
   if(!res.success) return;
   cvs=res.data;
   const myGroup=user.groupCode==='admin'?null:user.groupCode;
-  const filtered=myGroup?cvs.filter(c=>c.groupCode===myGroup):cvs;
+  const filtered=myGroup?cvs.filter(c=>String(c.groupCode).trim()===String(myGroup).trim()):cvs;
   $('board-title').textContent=myGroup?`${myGroup} 모둠`:'전체';
   renderChart(filtered);
   renderCards(filtered);
@@ -959,14 +959,14 @@ async function loadVote(){
 }
 function renderVoteForm(){
   const myGroup=user.groupCode==='admin'?null:user.groupCode;
-  const pool=myGroup?cvs.filter(c=>c.groupCode===myGroup):cvs;
+  const pool=myGroup?cvs.filter(c=>String(c.groupCode).trim()===String(myGroup).trim()):cvs;
   $('vote-categories').innerHTML=(session?.awardCategories||AWARD_CATS).map(cat=>`
     <div class="glass fade-in" style="padding:18px;margin-bottom:14px;border-color:rgba(236,72,153,.1)">
       <div style="border-bottom:1px solid rgba(255,255,255,.05);padding-bottom:10px;margin-bottom:12px">
         <div style="font-size:.95rem;font-weight:900;color:var(--pink)">🏆 ${cat.name}</div>
         <div style="font-size:.72rem;color:var(--t2);margin-top:4px;font-style:italic">"${cat.desc}"</div>
       </div>
-      <div style="display:flex;flex-direction:column;gap:6px">${pool.map(cv=>{
+      <div style="display:flex;flex-direction:column;gap:6px">${pool.length===0?`<div class="text-xs text-dim text-center" style="padding:12px">해당 모둠에 제출된 이력서가 없습니다.</div>`:pool.map(cv=>{
     const isSelf=cv.cvId==='CV-'+user.voterId;
     return `<label style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:10px;border:1px solid ${isSelf?'rgba(255,255,255,.04)':'rgba(255,255,255,.07)'};cursor:${isSelf?'not-allowed':'pointer'};opacity:${isSelf?.4:1};transition:all .2s;background:rgba(255,255,255,.02)" ${isSelf?'':'onmouseover="this.style.background=\'rgba(255,255,255,.05)\'" onmouseout="this.style.background=\'rgba(255,255,255,.02)\'"'}>
       <div><div style="font-size:.82rem;font-weight:700">${cv.part1.projectName}</div><div style="font-size:.68rem;color:var(--t2);margin-top:2px">${cv.school} · ${cv.authorName} 교사${isSelf?' (나)':''}</div></div>
